@@ -4,6 +4,8 @@
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <RootNamespace>FlareSolverrSharp.Sample</RootNamespace>
+    <AssemblyName>FlareSolverrSharp.Sample</AssemblyName>
+    <Version>1.0.3</Version>
   </PropertyGroup>
 
   <ItemGroup>

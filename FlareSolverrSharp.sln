@@ -1,13 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.28010.2026
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30709.132
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FlareSolverrSharp", "src\FlareSolverrSharp\FlareSolverrSharp.csproj", "{E541E27A-8D55-4E2F-AC7D-DCA0DCDAC220}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FlareSolverrSharp.Sample", "sample\FlareSolverrSharp.Sample\FlareSolverrSharp.Sample.csproj", "{F44FEFA6-B85B-4C05-AD34-836DF6BF63B9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FlareSolverrSharp.Tests", "test\FlareSolverrSharp.Tests\FlareSolverrSharp.Tests.csproj", "{89A9D8CB-01BA-43CA-83AE-2D760088154C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FlareSolverrSharp.Tests", "test\FlareSolverrSharp.Tests\FlareSolverrSharp.Tests.csproj", "{89A9D8CB-01BA-43CA-83AE-2D760088154C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -44,11 +44,17 @@ namespace FlareSolverrSharp.Solvers
                 }
                 catch (Exception e)
                 {
-                    throw new FlareSolverrException(e.ToString());
+                    throw new FlareSolverrException("Exception: " + e.ToString());
                 }
                 finally
                 {
                     _httpClient.Dispose();
+                }
+
+                // Don't try parsing if FlareSolverr hasn't returned 200 or 500
+                if (response.StatusCode != HttpStatusCode.OK && response.StatusCode != HttpStatusCode.InternalServerError)
+                {
+                    throw new FlareSolverrException("HTTP StatusCode not 200 or 500. Status is :" + response.StatusCode);
                 }
 
                 var resContent = await response.Content.ReadAsStringAsync();
@@ -58,11 +64,40 @@ namespace FlareSolverrSharp.Solvers
                 }
                 catch (Exception)
                 {
-                    throw new FlareSolverrException("Error parsing response, check FlareSolverr version. Response: " + resContent);
+                    throw new FlareSolverrException("Error parsing response, check FlareSolverr. Response: " + resContent);
                 }
 
-                if (response.StatusCode != HttpStatusCode.OK)
-                    throw new FlareSolverrException(result.Message);
+                    try
+                {
+                    Enum.TryParse(result.Status, true, out FlareSolverrStatusCode returnStatusCode);
+
+                    if (returnStatusCode.Equals(FlareSolverrStatusCode.ok))
+                    {
+                        return result;
+                    }
+                    else if (returnStatusCode.Equals(FlareSolverrStatusCode.warning))
+                    {
+                        throw new FlareSolverrException(
+                            "FlareSolverr was able to process the request, but a captcha was detected. Message: "
+                            + result.Message);
+                    }
+                    else if (returnStatusCode.Equals(FlareSolverrStatusCode.error))
+                    {
+                        throw new FlareSolverrException(
+                            "FlareSolverr was unable to process the request, please check FlareSolverr logs. Message: "
+                            + result.Message);
+                    }
+                    else
+                    {
+                        throw new FlareSolverrException("Unable to map FlareSolverr returned status code, received code: "
+                            + result.Status + ". Message: " + result.Message);
+                    }
+                }
+                catch (ArgumentException)
+                {
+                    throw new FlareSolverrException("Error parsing status code, check FlareSolverr log. Status: "
+                            + result.Status + ". Message: " + result.Message);
+                }
             });
 
             return result;
@@ -70,12 +105,25 @@ namespace FlareSolverrSharp.Solvers
 
         private HttpContent GenerateFlareSolverrRequest(HttpRequestMessage request)
         {
-            var req = new FlareSolverrRequest
+            FlareSolverrRequest req;
+
+            if (request.Method == HttpMethod.Get)
             {
-                Method = "GET",
-                Url = request.RequestUri.ToString(),
-                MaxTimeout = MaxTimeout
-            };
+                req = new FlareSolverrRequestGet
+                {
+                    Cmd = "request.get",
+                    Url = request.RequestUri.ToString(),
+                    MaxTimeout = MaxTimeout
+                };
+            }
+            else if (request.Method == HttpMethod.Post)
+            {
+                throw new FlareSolverrException("Not currently implemented HttpMethod: POST");
+            }
+            else
+            {
+                throw new FlareSolverrException("Unsupported HttpMethod: " + request.Method.ToString());
+            }
 
             var userAgent = request.Headers.UserAgent.ToString();
             if (!string.IsNullOrWhiteSpace(userAgent))

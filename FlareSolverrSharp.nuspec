@@ -2,7 +2,7 @@
 <package>
   <metadata>
     <id>FlareSolverrSharp</id>
-    <version>1.0.0</version>
+    <version>1.0.3</version>
     <authors>Diego Heras (ngosang)</authors>
     <owners>Diego Heras (ngosang)</owners>
     <description>FlareSolverr .Net / Proxy server to bypass Cloudflare protection.</description>

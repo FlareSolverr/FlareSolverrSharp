@@ -11,7 +11,7 @@ namespace FlareSolverrSharp.Sample
         {
             var handler = new ClearanceHandler("http://localhost:8191/")
             {
-                UserAgent = "Mozilla/5.0 (X11; Linux x86_64; rv:76.0) Gecko/20100101 Firefox/76.0",
+                UserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.138 Safari/537.36",
                 MaxTimeout = 60000
             };
 
