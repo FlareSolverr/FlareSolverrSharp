@@ -5,9 +5,6 @@ namespace FlareSolverrSharp.Types
 {
     public class FlareSolverrRequestPost : FlareSolverrRequest
     {
-        [JsonProperty("headers")]
-        public string Headers;
-
         [JsonProperty("postData")]
         public string PostData;
 

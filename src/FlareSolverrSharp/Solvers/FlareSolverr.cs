@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Net;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
+using FlareSolverrSharp.Constants;
 using FlareSolverrSharp.Exceptions;
 using FlareSolverrSharp.Types;
 using FlareSolverrSharp.Utilities;
@@ -107,29 +109,70 @@ namespace FlareSolverrSharp.Solvers
         {
             FlareSolverrRequest req;
 
+            var url = request.RequestUri.ToString();
+            var userAgent = request.Headers.UserAgent.ToString();
+
+            if (!string.IsNullOrWhiteSpace(userAgent))
+                userAgent = null;
+
             if (request.Method == HttpMethod.Get)
             {
                 req = new FlareSolverrRequestGet
                 {
                     Cmd = "request.get",
-                    Url = request.RequestUri.ToString(),
-                    MaxTimeout = MaxTimeout
+                    Url = url,
+                    MaxTimeout = MaxTimeout,
+                    UserAgent = userAgent
                 };
             }
             else if (request.Method == HttpMethod.Post)
             {
-                throw new FlareSolverrException("Not currently implemented HttpMethod: POST");
+                var contentTypeType = request.Content.GetType();
+
+                if (contentTypeType == typeof(FormUrlEncodedContent))
+                {
+                    var contentTypeValue = request.Content.Headers.ContentType.ToString();
+                    var postData = request.Content.ReadAsStringAsync().Result;
+
+                    req = new FlareSolverrRequestPostUrlEncoded
+                    {
+                        Cmd = "request.post",
+                        Url = url,
+                        PostData = postData,
+                        Headers = new HeadersPost
+                        {
+                            ContentType = contentTypeValue,
+                            // ContentLength will be filled automatically in Chrome
+                            ContentLength = null
+                },
+                        MaxTimeout = MaxTimeout,
+                        UserAgent = userAgent
+                    };
+                }
+                else if (contentTypeType == typeof(MultipartFormDataContent))
+                {
+                    //TODO Implement - check if we just need to pass the content-type with the relevent headers
+                    throw new FlareSolverrException("Unimplemented POST Content-Type: " + request.Content.Headers.ContentType.ToString());
+                }
+                else if (contentTypeType == typeof(StringContent))
+                {
+                    //TODO Implement - check if we just need to pass the content-type with the relevent headers
+                    throw new FlareSolverrException("Unimplemented POST Content-Type: " + request.Content.Headers.ContentType.ToString());
+                }
+                else
+                {
+                    throw new FlareSolverrException("Unsupported POST Content-Type: " + request.Content.Headers.ContentType.ToString());
+                }
             }
             else
             {
                 throw new FlareSolverrException("Unsupported HttpMethod: " + request.Method.ToString());
             }
 
-            var userAgent = request.Headers.UserAgent.ToString();
-            if (!string.IsNullOrWhiteSpace(userAgent))
-                req.UserAgent = userAgent;
-
-            var payload = JsonConvert.SerializeObject(req);
+            var payload = JsonConvert.SerializeObject(req, new JsonSerializerSettings
+            {
+                NullValueHandling = NullValueHandling.Ignore
+            });
             HttpContent content = new StringContent(payload, Encoding.UTF8, "application/json");
             return content;
         }
