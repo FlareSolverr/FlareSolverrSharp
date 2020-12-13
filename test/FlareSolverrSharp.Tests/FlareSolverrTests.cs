@@ -24,7 +24,7 @@ namespace FlareSolverrSharp.Tests
             Assert.AreEqual("", flareSolverrResponse.Message);
             Assert.IsTrue(flareSolverrResponse.StartTimestamp > 0);
             Assert.IsTrue(flareSolverrResponse.EndTimestamp > flareSolverrResponse.StartTimestamp);
-            Assert.AreEqual("1.0.3", flareSolverrResponse.Version);
+            Assert.IsTrue(flareSolverrResponse.Version.Contains("1.2."));
 
             Assert.AreEqual("https://www.google.com/", flareSolverrResponse.Solution.Url);
             Assert.IsTrue(flareSolverrResponse.Solution.Response.Contains("<title>Google</title>"));
@@ -64,7 +64,7 @@ namespace FlareSolverrSharp.Tests
             }
             catch (FlareSolverrException e)
             {
-                Assert.AreEqual("NS_ERROR_UNKNOWN_HOST at https://www.google.bad1/", e.Message);
+                Assert.AreEqual("FlareSolverr was unable to process the request, please check FlareSolverr logs. Message: Unable to process browser request. Error: Error: net::ERR_NAME_NOT_RESOLVED at https://www.google.bad1/", e.Message);
             }
             catch (Exception e)
             {

@@ -10,7 +10,7 @@ namespace FlareSolverrSharp.Tests
     [TestClass]
     public class ClearanceHandlerTests
     {
-        private readonly Uri _protectedUri = new Uri("http://www.bteye.org/");
+        private readonly Uri _protectedUri = new Uri("https://yggtorrent.si/");
 
         [TestMethod]
         public async Task SolveOk()
