@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Net;
 using System.Net.Http;
-using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
-using FlareSolverrSharp.Constants;
 using FlareSolverrSharp.Exceptions;
 using FlareSolverrSharp.Types;
 using FlareSolverrSharp.Utilities;
@@ -46,7 +44,7 @@ namespace FlareSolverrSharp.Solvers
                 }
                 catch (Exception e)
                 {
-                    throw new FlareSolverrException("Exception: " + e.ToString());
+                    throw new FlareSolverrException("Exception: " + e);
                 }
                 finally
                 {
@@ -69,7 +67,7 @@ namespace FlareSolverrSharp.Solvers
                     throw new FlareSolverrException("Error parsing response, check FlareSolverr. Response: " + resContent);
                 }
 
-                    try
+                try
                 {
                     Enum.TryParse(result.Status, true, out FlareSolverrStatusCode returnStatusCode);
 
@@ -151,22 +149,22 @@ namespace FlareSolverrSharp.Solvers
                 }
                 else if (contentTypeType == typeof(MultipartFormDataContent))
                 {
-                    //TODO Implement - check if we just need to pass the content-type with the relevent headers
-                    throw new FlareSolverrException("Unimplemented POST Content-Type: " + request.Content.Headers.ContentType.ToString());
+                    //TODO Implement - check if we just need to pass the content-type with the relevant headers
+                    throw new FlareSolverrException("Unimplemented POST Content-Type: " + request.Content.Headers.ContentType);
                 }
                 else if (contentTypeType == typeof(StringContent))
                 {
-                    //TODO Implement - check if we just need to pass the content-type with the relevent headers
-                    throw new FlareSolverrException("Unimplemented POST Content-Type: " + request.Content.Headers.ContentType.ToString());
+                    //TODO Implement - check if we just need to pass the content-type with the relevant headers
+                    throw new FlareSolverrException("Unimplemented POST Content-Type: " + request.Content.Headers.ContentType);
                 }
                 else
                 {
-                    throw new FlareSolverrException("Unsupported POST Content-Type: " + request.Content.Headers.ContentType.ToString());
+                    throw new FlareSolverrException("Unsupported POST Content-Type: " + request.Content.Headers.ContentType);
                 }
             }
             else
             {
-                throw new FlareSolverrException("Unsupported HttpMethod: " + request.Method.ToString());
+                throw new FlareSolverrException("Unsupported HttpMethod: " + request.Method);
             }
 
             var payload = JsonConvert.SerializeObject(req, new JsonSerializerSettings

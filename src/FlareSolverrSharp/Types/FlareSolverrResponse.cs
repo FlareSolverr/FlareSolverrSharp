@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 
+// ReSharper disable UnusedMember.Global
 // ReSharper disable UnassignedField.Global
 // ReSharper disable ClassNeverInstantiated.Global
 namespace FlareSolverrSharp.Types

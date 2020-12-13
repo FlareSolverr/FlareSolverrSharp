@@ -13,7 +13,7 @@ using Cookie = System.Net.Cookie;
 namespace FlareSolverrSharp
 {
     /// <summary>
-    /// A HTTP handler that transparently manages Cloudflare's protection bypass.
+    /// A HTTP handler that transparently manages CloudFlare's protection bypass.
     /// </summary>
     public class ClearanceHandler : DelegatingHandler
     {
@@ -21,7 +21,7 @@ namespace FlareSolverrSharp
         private readonly FlareSolverr _flareSolverr;
 
         /// <summary>
-        /// The User-Agent which will be used accross this session (null means default FlareSolverr User-Agent).
+        /// The User-Agent which will be used across this session (null means default FlareSolverr User-Agent).
         /// </summary>
         public string UserAgent = null;
 
