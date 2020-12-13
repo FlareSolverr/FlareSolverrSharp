@@ -41,7 +41,7 @@ all websites as if they're not protected with anything.
 ```csharp
 var handler = new ClearanceHandler("http://localhost:8191/")
 {
-    UserAgent = "Mozilla/5.0 (X11; Linux x86_64; rv:76.0) Gecko/20100101 Firefox/76.0",
+    UserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.138 Safari/537.36",
     MaxTimeout = 60000
 };
 
@@ -64,7 +64,7 @@ The User-Agent which will be used across this session. If you didn't set it, the
 
 **User-Agent must be the same as the one used to solve the challenge, otherwise Cloudflare will flag you as a bot.**
 
-Example: Mozilla/5.0 (X11; Linux i686; rv:77.0) Gecko/20100101 Firefox/77.0
+Example: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.138 Safari/537.36
 
 ### MaxTimeout
 Max timeout to solve the challenge.

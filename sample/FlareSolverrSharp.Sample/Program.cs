@@ -5,7 +5,8 @@ namespace FlareSolverrSharp.Sample
     {
         static void Main(string[] args)
         {
-            ClearanceHandlerSample.Sample().Wait();
+            ClearanceHandlerSample.SampleGet().Wait();
+            ClearanceHandlerSample.SamplePostUrlEncoded().Wait();
         }
     }
 }
