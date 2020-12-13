@@ -4,7 +4,7 @@ FlareSolverrSharp
 
 FlareSolverr .Net DelegatingHandler / interceptor.
 
-[FlareSolverr](https://github.com/ngosang/FlareSolverr) is a proxy server to bypass Cloudflare protection.
+[FlareSolverr](https://github.com/FlareSolverr/FlareSolverr) is a proxy server to bypass Cloudflare protection.
 
 :warning: This project is in beta state. Some things may not work and the API can change at any time.
 
@@ -16,7 +16,7 @@ Full-Featured library:
 # Dependencies
 - [.NET Standard 1.3](https://github.com/dotnet/standard/blob/master/docs/versions/netstandard1.3.md)
 
-You need a running [FlareSolverr](https://github.com/ngosang/FlareSolverr) service.
+You need a running [FlareSolverr](https://github.com/FlareSolverr/FlareSolverr) service.
 
 # Issues
 Cloudflare regularly modifies their protection challenge and improves their bot detection capabilities.
@@ -50,7 +50,7 @@ var content = await client.GetStringAsync("https://uam.hitmehard.fun/HIT");
 Console.WriteLine(content);
 ```
 
-**Full example [here](https://github.com/ngosang/FlareSolverrSharp/tree/master/sample/FlareSolverrSharp.Sample)**
+**Full example [here](https://github.com/FlareSolverr/FlareSolverrSharp/tree/master/sample/FlareSolverrSharp.Sample)**
 
 # Options
 ### FlareSolverr Service API
