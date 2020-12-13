@@ -75,23 +75,23 @@ namespace FlareSolverrSharp.Solvers
                     {
                         return result;
                     }
-                    else if (returnStatusCode.Equals(FlareSolverrStatusCode.warning))
+
+                    if (returnStatusCode.Equals(FlareSolverrStatusCode.warning))
                     {
                         throw new FlareSolverrException(
                             "FlareSolverr was able to process the request, but a captcha was detected. Message: "
                             + result.Message);
                     }
-                    else if (returnStatusCode.Equals(FlareSolverrStatusCode.error))
+
+                    if (returnStatusCode.Equals(FlareSolverrStatusCode.error))
                     {
                         throw new FlareSolverrException(
                             "FlareSolverr was unable to process the request, please check FlareSolverr logs. Message: "
                             + result.Message);
                     }
-                    else
-                    {
-                        throw new FlareSolverrException("Unable to map FlareSolverr returned status code, received code: "
-                            + result.Status + ". Message: " + result.Message);
-                    }
+
+                    throw new FlareSolverrException("Unable to map FlareSolverr returned status code, received code: "
+                        + result.Status + ". Message: " + result.Message);
                 }
                 catch (ArgumentException)
                 {
@@ -110,7 +110,7 @@ namespace FlareSolverrSharp.Solvers
             var url = request.RequestUri.ToString();
             var userAgent = request.Headers.UserAgent.ToString();
 
-            if (!string.IsNullOrWhiteSpace(userAgent))
+            if (string.IsNullOrWhiteSpace(userAgent))
                 userAgent = null;
 
             if (request.Method == HttpMethod.Get)
