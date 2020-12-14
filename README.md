@@ -1,6 +1,8 @@
 FlareSolverrSharp
 ==================
 [![NuGet](https://img.shields.io/nuget/v/FlareSolverrSharp.svg?maxAge=60)](https://www.nuget.org/packages/FlareSolverrSharp)
+[![GitHub issues](https://img.shields.io/github/issues/FlareSolverr/FlareSolverrSharp.svg?maxAge=60&style=flat-square)](https://github.com/FlareSolverr/FlareSolverrSharp/issues)
+[![GitHub pull requests](https://img.shields.io/github/issues-pr/FlareSolverr/FlareSolverrSharp.svg?maxAge=60&style=flat-square)](https://github.com/FlareSolverr/FlareSolverrSharp/pulls)
 
 FlareSolverr .Net DelegatingHandler / interceptor.
 
