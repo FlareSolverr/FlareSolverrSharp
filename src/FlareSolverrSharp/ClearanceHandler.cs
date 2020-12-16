@@ -64,8 +64,8 @@ namespace FlareSolverrSharp
         /// <returns>The task object representing the asynchronous operation.</returns>
         protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
         {
-            // Change the User-Agent if required
-            OverrideUserAgentHeader(request);
+            // Add the User-Agent if required
+            SetUserAgentHeader(request);
 
             // Perform the original user request
             var response = await base.SendAsync(request, cancellationToken).ConfigureAwait(false);
@@ -94,14 +94,10 @@ namespace FlareSolverrSharp
             return response;
         }
 
-        private void OverrideUserAgentHeader(HttpRequestMessage request)
+        private void SetUserAgentHeader(HttpRequestMessage request)
         {
-            if (UserAgent == null)
-                return;
-            if (request.Headers.UserAgent.ToString().Equals(UserAgent))
-                return;
-            request.Headers.UserAgent.Clear();
-            request.Headers.Add(HttpHeaders.UserAgent, UserAgent);
+            if (UserAgent != null && string.IsNullOrWhiteSpace(request.Headers.UserAgent.ToString()))
+                request.Headers.Add(HttpHeaders.UserAgent, UserAgent);
         }
 
         private void InjectCookies(HttpRequestMessage request, FlareSolverrResponse flareSolverrResponse)

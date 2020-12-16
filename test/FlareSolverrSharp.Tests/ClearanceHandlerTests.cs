@@ -32,7 +32,7 @@ namespace FlareSolverrSharp.Tests
         {
             var handler = new ClearanceHandler(Settings.FlareSolverrApiUrl)
             {
-                UserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.138 Safari/537.36",
+                UserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/82.0.4044.138 Safari/537.36",
                 MaxTimeout = 60000
             };
 
@@ -40,7 +40,45 @@ namespace FlareSolverrSharp.Tests
             var response = await client.GetAsync(_protectedUri);
             Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
         }
-        
+
+        [TestMethod]
+        public async Task SolveOkCloudflareNoUserAgent()
+        {
+            // There is not default user-agent
+            var handler = new ClearanceHandler(Settings.FlareSolverrApiUrl)
+            {
+                MaxTimeout = 60000
+            };
+
+            // The request does not include the user-agent header => FlareSolverr will use the Chromium user-agent
+            // TODO: we have to check this manually in FlareSolverr log
+
+            var client = new HttpClient(handler);
+            var response = await client.GetAsync(_protectedUri);
+            Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
+        }
+
+        [TestMethod]
+        public async Task SolveOkCloudflareUserAgentHeader()
+        {
+            // Set default user-agent
+            var handler = new ClearanceHandler(Settings.FlareSolverrApiUrl)
+            {
+                UserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/82.0.4044.138 Safari/537.36",
+                MaxTimeout = 60000
+            };
+
+            var request = new HttpRequestMessage(HttpMethod.Get, _protectedUri);
+            request.Headers.UserAgent.ParseAdd("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4044.138 Safari/537.36");
+
+            // The request includes a different user agent => FlareSolverr must use this
+            // TODO: we have to check this manually in FlareSolverr log
+
+            var client = new HttpClient(handler);
+            var response = await client.SendAsync(request);
+            Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
+        }
+
         [TestMethod]
         public async Task SolveError()
         {
