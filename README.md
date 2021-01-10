@@ -1,31 +1,28 @@
-FlareSolverrSharp
-==================
+# FlareSolverrSharp
+
 [![Latest version](https://img.shields.io/nuget/v/FlareSolverrSharp.svg)](https://www.nuget.org/packages/FlareSolverrSharp)
 [![NuGet downloads](https://img.shields.io/nuget/dt/FlareSolverrSharp)](https://www.nuget.org/packages/FlareSolverrSharp)
 [![GitHub issues](https://img.shields.io/github/issues/FlareSolverr/FlareSolverrSharp.svg)](https://github.com/FlareSolverr/FlareSolverrSharp/issues)
 [![GitHub pull requests](https://img.shields.io/github/issues-pr/FlareSolverr/FlareSolverrSharp.svg)](https://github.com/FlareSolverr/FlareSolverrSharp/pulls)
-
 [![Donate PayPal](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=X5NJLLX5GLTV6&source=url)
 [![Donate Buy Me A Coffee](https://img.shields.io/badge/Donate-Buy%20me%20a%20coffee-yellow.svg)](https://www.buymeacoffee.com/ngosang)
 [![Donate Bitcoin](https://img.shields.io/badge/Donate-Bitcoin-orange.svg)](https://en.cryptobadges.io/donate/13Hcv77AdnFWEUZ9qUpoPBttQsUT7q9TTh)
 
-FlareSolverr .Net DelegatingHandler / interceptor.
-
-[FlareSolverr](https://github.com/FlareSolverr/FlareSolverr) is a proxy server to bypass Cloudflare protection.
+FlareSolverr .Net DelegatingHandler / interceptor. [FlareSolverr](https://github.com/FlareSolverr/FlareSolverr) is a proxy server to bypass Cloudflare protection.
 
 :warning: This project is in beta state. Some things may not work and the API can change at any time.
 
-# Installation
+## Installation
 Full-Featured library:
 
 `PM> Install-Package FlareSolverr`
 
-# Dependencies
+## Dependencies
 - [.NET Standard 1.3](https://github.com/dotnet/standard/blob/master/docs/versions/netstandard1.3.md)
 
 You need a running [FlareSolverr](https://github.com/FlareSolverr/FlareSolverr) service.
 
-# Issues
+## Issues
 Cloudflare regularly modifies their protection challenge and improves their bot detection capabilities.
 
 If you notice that the anti-bot page has changed, or if library suddenly stops working, please create a GitHub issue so that I can
@@ -33,8 +30,7 @@ update the code accordingly.
 
 Before submitting an issue, just be sure that you have the latest version of the library.
 
-# Usage
-
+## Usage
 A [DelegatingHandler](https://docs.microsoft.com/en-us/dotnet/api/system.net.http.delegatinghandler?view=netstandard-1.3) that
 handles the challenge solution automatically.
 
@@ -59,7 +55,7 @@ Console.WriteLine(content);
 
 **Full example [here](https://github.com/FlareSolverr/FlareSolverrSharp/tree/master/sample/FlareSolverrSharp.Sample)**
 
-# Options
+## Options
 ### FlareSolverr Service API
 You have to set the FlareSolverr service API in the ClearanceHandler constructor. If you set an empty or null endpoint,
 FlareSolverrSharp will be able to detect challenges, but it will not be able to solve them.
