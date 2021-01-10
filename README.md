@@ -1,8 +1,13 @@
 FlareSolverrSharp
 ==================
-[![NuGet](https://img.shields.io/nuget/v/FlareSolverrSharp.svg?maxAge=60)](https://www.nuget.org/packages/FlareSolverrSharp)
-[![GitHub issues](https://img.shields.io/github/issues/FlareSolverr/FlareSolverrSharp.svg?maxAge=60&style=flat-square)](https://github.com/FlareSolverr/FlareSolverrSharp/issues)
-[![GitHub pull requests](https://img.shields.io/github/issues-pr/FlareSolverr/FlareSolverrSharp.svg?maxAge=60&style=flat-square)](https://github.com/FlareSolverr/FlareSolverrSharp/pulls)
+[![Latest version](https://img.shields.io/nuget/v/FlareSolverrSharp.svg)](https://www.nuget.org/packages/FlareSolverrSharp)
+[![NuGet downloads](https://img.shields.io/nuget/dt/FlareSolverrSharp)](https://www.nuget.org/packages/FlareSolverrSharp)
+[![GitHub issues](https://img.shields.io/github/issues/FlareSolverr/FlareSolverrSharp.svg)](https://github.com/FlareSolverr/FlareSolverrSharp/issues)
+[![GitHub pull requests](https://img.shields.io/github/issues-pr/FlareSolverr/FlareSolverrSharp.svg)](https://github.com/FlareSolverr/FlareSolverrSharp/pulls)
+
+[![Donate PayPal](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=X5NJLLX5GLTV6&source=url)
+[![Donate Buy Me A Coffee](https://img.shields.io/badge/Donate-Buy%20me%20a%20coffee-yellow.svg)](https://www.buymeacoffee.com/ngosang)
+[![Donate Bitcoin](https://img.shields.io/badge/Donate-Bitcoin-orange.svg)](https://en.cryptobadges.io/donate/13Hcv77AdnFWEUZ9qUpoPBttQsUT7q9TTh)
 
 FlareSolverr .Net DelegatingHandler / interceptor.
 
