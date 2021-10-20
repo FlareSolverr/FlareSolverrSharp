@@ -17,6 +17,7 @@ namespace FlareSolverrSharp.Solvers
         private readonly Uri _flareSolverrUri;
 
         public int MaxTimeout = 60000;
+        public string ProxyUrl = "";
 
         public FlareSolverr(string flareSolverrApiUrl)
         {
@@ -108,10 +109,15 @@ namespace FlareSolverrSharp.Solvers
             FlareSolverrRequest req;
 
             var url = request.RequestUri.ToString();
-            var userAgent = request.Headers.UserAgent.ToString();
 
-            if (string.IsNullOrWhiteSpace(userAgent))
-                userAgent = null;
+            FlareSolverrRequestProxy proxy = null;
+            if (!string.IsNullOrWhiteSpace(ProxyUrl))
+            {
+                proxy = new FlareSolverrRequestProxy
+                {
+                    Url = ProxyUrl
+                };
+            }
 
             if (request.Method == HttpMethod.Get)
             {
@@ -120,31 +126,21 @@ namespace FlareSolverrSharp.Solvers
                     Cmd = "request.get",
                     Url = url,
                     MaxTimeout = MaxTimeout,
-                    UserAgent = userAgent
+                    Proxy = proxy
                 };
             }
             else if (request.Method == HttpMethod.Post)
             {
                 var contentTypeType = request.Content.GetType();
-
                 if (contentTypeType == typeof(FormUrlEncodedContent))
                 {
-                    var contentTypeValue = request.Content.Headers.ContentType.ToString();
-                    var postData = request.Content.ReadAsStringAsync().Result;
-
-                    req = new FlareSolverrRequestPostUrlEncoded
+                    req = new FlareSolverrRequestPost
                     {
                         Cmd = "request.post",
                         Url = url,
-                        PostData = postData,
-                        Headers = new HeadersPost
-                        {
-                            ContentType = contentTypeValue,
-                            // ContentLength will be filled automatically in Chrome
-                            ContentLength = null
-                },
+                        PostData = request.Content.ReadAsStringAsync().Result,
                         MaxTimeout = MaxTimeout,
-                        UserAgent = userAgent
+                        Proxy = proxy
                     };
                 }
                 else if (contentTypeType == typeof(MultipartFormDataContent))

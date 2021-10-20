@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading;
@@ -18,17 +19,20 @@ namespace FlareSolverrSharp
     public class ClearanceHandler : DelegatingHandler
     {
         private readonly HttpClient _client;
-        private readonly FlareSolverr _flareSolverr;
-
-        /// <summary>
-        /// The User-Agent which will be used across this session (null means default FlareSolverr User-Agent).
-        /// </summary>
-        public string UserAgent = null;
+        private readonly string _flareSolverrApiUrl;
+        private FlareSolverr _flareSolverr;
+        private string _userAgent;
 
         /// <summary>
         /// Max timeout to solve the challenge.
         /// </summary>
         public int MaxTimeout = 60000;
+
+        /// <summary>
+        /// HTTP Proxy URL.
+        /// Example: http://127.0.0.1:8888
+        /// </summary>
+        public string ProxyUrl = "";
 
         private HttpClientHandler HttpClientHandler => InnerHandler.GetMostInnerHandler() as HttpClientHandler;
 
@@ -40,20 +44,19 @@ namespace FlareSolverrSharp
         public ClearanceHandler(string flareSolverrApiUrl)
             : base(new HttpClientHandler())
         {
+            // Validate URI
+            if (!string.IsNullOrWhiteSpace(flareSolverrApiUrl)
+                && !Uri.IsWellFormedUriString(flareSolverrApiUrl, UriKind.Absolute))
+                throw new FlareSolverrException("FlareSolverr URL is malformed: " + flareSolverrApiUrl);
+
+            _flareSolverrApiUrl = flareSolverrApiUrl;
+
             _client = new HttpClient(new HttpClientHandler
             {
                 AllowAutoRedirect = false,
                 AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate,
                 CookieContainer = new CookieContainer()
             });
-
-            if (!string.IsNullOrWhiteSpace(flareSolverrApiUrl))
-            {
-                _flareSolverr = new FlareSolverr(flareSolverrApiUrl)
-                {
-                    MaxTimeout = MaxTimeout
-                };
-            }
         }
 
         /// <summary>
@@ -64,7 +67,17 @@ namespace FlareSolverrSharp
         /// <returns>The task object representing the asynchronous operation.</returns>
         protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
         {
-            // Add the User-Agent if required
+            // Init FlareSolverr
+            if (_flareSolverr == null && !string.IsNullOrWhiteSpace(_flareSolverrApiUrl))
+            {
+                _flareSolverr = new FlareSolverr(_flareSolverrApiUrl)
+                {
+                    MaxTimeout = MaxTimeout,
+                    ProxyUrl = ProxyUrl
+                };
+            }
+
+            // Set the User-Agent if required
             SetUserAgentHeader(request);
 
             // Perform the original user request
@@ -78,6 +91,16 @@ namespace FlareSolverrSharp
 
                 // Resolve the challenge using FlareSolverr API
                 var flareSolverrResponse = await _flareSolverr.Solve(request);
+
+                // Save the FlareSolverr User-Agent for the following requests
+                var flareSolverUserAgent = flareSolverrResponse.Solution.UserAgent;
+                if (flareSolverUserAgent != null && !flareSolverUserAgent.Equals(request.Headers.UserAgent.ToString()))
+                {
+                    _userAgent = flareSolverUserAgent;
+
+                    // Set the User-Agent if required
+                    SetUserAgentHeader(request);
+                }
 
                 // Change the cookies in the original request with the cookies provided by FlareSolverr
                 InjectCookies(request, flareSolverrResponse);
@@ -96,8 +119,12 @@ namespace FlareSolverrSharp
 
         private void SetUserAgentHeader(HttpRequestMessage request)
         {
-            if (UserAgent != null && string.IsNullOrWhiteSpace(request.Headers.UserAgent.ToString()))
-                request.Headers.Add(HttpHeaders.UserAgent, UserAgent);
+            if (_userAgent != null)
+            {
+                // Overwrite the header
+                request.Headers.Remove(HttpHeaders.UserAgent);
+                request.Headers.Add(HttpHeaders.UserAgent, _userAgent);
+            }
         }
 
         private void InjectCookies(HttpRequestMessage request, FlareSolverrResponse flareSolverrResponse)

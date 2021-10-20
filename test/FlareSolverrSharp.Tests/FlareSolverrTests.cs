@@ -24,12 +24,12 @@ namespace FlareSolverrSharp.Tests
             Assert.AreEqual("", flareSolverrResponse.Message);
             Assert.IsTrue(flareSolverrResponse.StartTimestamp > 0);
             Assert.IsTrue(flareSolverrResponse.EndTimestamp > flareSolverrResponse.StartTimestamp);
-            Assert.IsTrue(flareSolverrResponse.Version.Contains("1.2."));
+            Assert.IsTrue(flareSolverrResponse.Version.Contains("2."));
 
             Assert.AreEqual("https://www.google.com/", flareSolverrResponse.Solution.Url);
             Assert.IsTrue(flareSolverrResponse.Solution.Response.Contains("<title>Google</title>"));
             Assert.IsTrue(flareSolverrResponse.Solution.Cookies.Any());
-            Assert.IsTrue(flareSolverrResponse.Solution.UserAgent.Contains(" Chrome/"));
+            Assert.IsTrue(flareSolverrResponse.Solution.UserAgent.Contains("Firefox/"));
 
             var firstCookie = flareSolverrResponse.Solution.Cookies.First();
             Assert.IsTrue(!string.IsNullOrWhiteSpace(firstCookie.Name));
@@ -47,11 +47,38 @@ namespace FlareSolverrSharp.Tests
 
             var flareSolverrResponse = await flareSolverr.Solve(request);
             Assert.AreEqual("ok", flareSolverrResponse.Status);
-            Assert.AreEqual(userAgent, flareSolverrResponse.Solution.UserAgent);
+            Assert.IsTrue(flareSolverrResponse.Solution.UserAgent.Contains("Firefox/"));
         }
 
         [TestMethod]
-        public async Task SolveError()
+        public async Task SolveOkProxy()
+        {
+            var uri = new Uri("https://www.google.com/");
+            var flareSolverr = new FlareSolverr(Settings.FlareSolverrApiUrl)
+            {
+                ProxyUrl = Settings.ProxyUrl
+            };
+            var request = new HttpRequestMessage(HttpMethod.Get, uri);
+
+            var flareSolverrResponse = await flareSolverr.Solve(request);
+            Assert.AreEqual("ok", flareSolverrResponse.Status);
+            Assert.AreEqual("", flareSolverrResponse.Message);
+            Assert.IsTrue(flareSolverrResponse.StartTimestamp > 0);
+            Assert.IsTrue(flareSolverrResponse.EndTimestamp > flareSolverrResponse.StartTimestamp);
+            Assert.IsTrue(flareSolverrResponse.Version.Contains("2."));
+
+            Assert.AreEqual("https://www.google.com/", flareSolverrResponse.Solution.Url);
+            Assert.IsTrue(flareSolverrResponse.Solution.Response.Contains("<title>Google</title>"));
+            Assert.IsTrue(flareSolverrResponse.Solution.Cookies.Any());
+            Assert.IsTrue(flareSolverrResponse.Solution.UserAgent.Contains("Firefox/"));
+
+            var firstCookie = flareSolverrResponse.Solution.Cookies.First();
+            Assert.IsTrue(!string.IsNullOrWhiteSpace(firstCookie.Name));
+            Assert.IsTrue(!string.IsNullOrWhiteSpace(firstCookie.Value));
+        }
+
+        [TestMethod]
+        public async Task SolveErrorUrl()
         {
             var uri = new Uri("https://www.google.bad1/");
             var flareSolverr = new FlareSolverr(Settings.FlareSolverrApiUrl);
@@ -64,7 +91,7 @@ namespace FlareSolverrSharp.Tests
             }
             catch (FlareSolverrException e)
             {
-                Assert.AreEqual("FlareSolverr was unable to process the request, please check FlareSolverr logs. Message: Unable to process browser request. Error: Error: net::ERR_NAME_NOT_RESOLVED at https://www.google.bad1/", e.Message);
+                Assert.AreEqual("FlareSolverr was unable to process the request, please check FlareSolverr logs. Message: Error: Unable to process browser request. Error: NS_ERROR_UNKNOWN_HOST at https://www.google.bad1/", e.Message);
             }
             catch (Exception e)
             {
@@ -87,6 +114,56 @@ namespace FlareSolverrSharp.Tests
             catch (FlareSolverrException e)
             {
                 Assert.IsTrue(e.Message.Contains("Error connecting to FlareSolverr server"));
+            }
+            catch (Exception e)
+            {
+                Assert.Fail("Unexpected exception: " + e);
+            }
+        }
+
+        [TestMethod]
+        public async Task SolveErrorProxy()
+        {
+            var uri = new Uri("https://www.google.com/");
+            var flareSolverr = new FlareSolverr(Settings.FlareSolverrApiUrl)
+            {
+                ProxyUrl = "http://localhost:44445"
+            };
+            var request = new HttpRequestMessage(HttpMethod.Get, uri);
+
+            try
+            {
+                await flareSolverr.Solve(request);
+                Assert.Fail("Exception not thrown");
+            }
+            catch (FlareSolverrException e)
+            {
+                Assert.IsTrue(e.Message.Contains("FlareSolverr was unable to process the request, please check FlareSolverr logs. Message: Error: Unable to process browser request. Error: NS_ERROR_PROXY_CONNECTION_REFUSED at https://www.google.com/"));
+            }
+            catch (Exception e)
+            {
+                Assert.Fail("Unexpected exception: " + e);
+            }
+        }
+
+        [TestMethod]
+        public async Task SolveErrorTimeout()
+        {
+            var uri = new Uri("https://www.google.com/");
+            var flareSolverr = new FlareSolverr(Settings.FlareSolverrApiUrl)
+            {
+                MaxTimeout = 100
+            };
+            var request = new HttpRequestMessage(HttpMethod.Get, uri);
+
+            try
+            {
+                await flareSolverr.Solve(request);
+                Assert.Fail("Exception not thrown");
+            }
+            catch (FlareSolverrException e)
+            {
+                Assert.IsTrue(e.Message.Contains("FlareSolverr was unable to process the request, please check FlareSolverr logs. Message: Error: Unable to process browser request. Error: Maximum timeout reached. maxTimeout=100 (ms)"));
             }
             catch (Exception e)
             {

@@ -10,8 +10,6 @@
 
 FlareSolverr .Net DelegatingHandler / interceptor. [FlareSolverr](https://github.com/FlareSolverr/FlareSolverr) is a proxy server to bypass Cloudflare protection.
 
-:warning: This project is in beta state. Some things may not work and the API can change at any time.
-
 ## Installation
 Full-Featured library:
 
@@ -44,8 +42,8 @@ all websites as if they're not protected with anything.
 ```csharp
 var handler = new ClearanceHandler("http://localhost:8191/")
 {
-    UserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.138 Safari/537.36",
-    MaxTimeout = 60000
+    MaxTimeout = 60000,
+    ProxyUrl = "http://127.0.0.1:8888"
 };
 
 var client = new HttpClient(handler);
@@ -62,16 +60,14 @@ FlareSolverrSharp will be able to detect challenges, but it will not be able to 
 
 Example: http://localhost:8191/
 
-### UserAgent
-The User-Agent which will be used across this session. If you didn't set it, the default FlareSolverr User-Agent will be used.
-
-**User-Agent must be the same as the one used to solve the challenge, otherwise Cloudflare will flag you as a bot.**
-
-Example: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.138 Safari/537.36
-
 ### MaxTimeout
 Max timeout to solve the challenge.
 
 **MaxTimeout should be greater than 15000 (15 seconds) because starting the web browser and solving the challenge takes time.**
 
 Example: 60000
+
+### ProxyUrl
+The ProxyUrl which will be sent to FlareSolverr.
+
+Example: http://127.0.0.1:8888
