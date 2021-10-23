@@ -26,9 +26,9 @@ namespace FlareSolverrSharp.Solvers
                 apiUrl += "/";
             _flareSolverrUri = new Uri(apiUrl + "v1");
         }
-        public async Task<FlareSolverrResponse> Solve(HttpRequestMessage request)
+        public async Task<FlareSolverrResponse> Solve(HttpRequestMessage request, String sessionID = "")
         {
-            return await SendFlareSolverrRequest(GenerateFlareSolverrRequest(request));
+            return await SendFlareSolverrRequest(GenerateFlareSolverrRequest(request, sessionID));
         }
 
         public async Task<FlareSolverrResponse> CreateSession()
@@ -165,9 +165,11 @@ namespace FlareSolverrSharp.Solvers
             return content;
         }
 
-        private HttpContent GenerateFlareSolverrRequest(HttpRequestMessage request)
+        private HttpContent GenerateFlareSolverrRequest(HttpRequestMessage request, String sessionID = "")
         {
             FlareSolverrRequest req;
+            if (String.IsNullOrWhiteSpace(sessionID))
+                sessionID = null; 
 
             var url = request.RequestUri.ToString();
 
@@ -180,7 +182,8 @@ namespace FlareSolverrSharp.Solvers
                     Cmd = "request.get",
                     Url = url,
                     MaxTimeout = MaxTimeout,
-                    Proxy = proxy
+                    Proxy = proxy,
+                    Session = sessionID
                 };
             }
             else if (request.Method == HttpMethod.Post)
@@ -194,7 +197,8 @@ namespace FlareSolverrSharp.Solvers
                         Url = url,
                         PostData = request.Content.ReadAsStringAsync().Result,
                         MaxTimeout = MaxTimeout,
-                        Proxy = proxy
+                        Proxy = proxy,
+                        Session = sessionID
                     };
                 }
                 else if (contentTypeType == typeof(MultipartFormDataContent))
