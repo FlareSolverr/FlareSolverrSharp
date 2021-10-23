@@ -13,6 +13,8 @@ namespace FlareSolverrSharp.Types
         public long EndTimestamp;
         public string Version;
         public Solution Solution;
+        public string Session;
+        public string[] Sessions;
     }
 
     public class Solution

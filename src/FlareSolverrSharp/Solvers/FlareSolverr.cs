@@ -26,8 +26,46 @@ namespace FlareSolverrSharp.Solvers
                 apiUrl += "/";
             _flareSolverrUri = new Uri(apiUrl + "v1");
         }
-
         public async Task<FlareSolverrResponse> Solve(HttpRequestMessage request)
+        {
+            return await SendFlareSolverrRequest(GenerateFlareSolverrRequest(request));
+        }
+
+        public async Task<FlareSolverrResponse> CreateSession()
+        {
+            var req = new FlareSolverrRequestGet
+            {
+                Cmd = "sessions.create",
+                MaxTimeout = MaxTimeout,
+                Proxy = GetProxy()
+            };
+            return await SendFlareSolverrRequest(GetSolverRequestContent(req));
+        }
+
+        public async Task<FlareSolverrResponse> ListSessions()
+        {
+            var req = new FlareSolverrRequestGet
+            {
+                Cmd = "sessions.list",
+                MaxTimeout = MaxTimeout,
+                Proxy = GetProxy()
+            };
+            return await SendFlareSolverrRequest(GetSolverRequestContent(req));
+        }
+
+        public async Task<FlareSolverrResponse> DestroySession(String sessionID)
+        {
+            var req = new FlareSolverrRequestGet
+            {
+                Cmd = "sessions.destroy",
+                MaxTimeout = MaxTimeout,
+                Proxy = GetProxy(),
+                Session = sessionID
+            };
+            return await SendFlareSolverrRequest(GetSolverRequestContent(req));
+        }
+
+        private async Task<FlareSolverrResponse> SendFlareSolverrRequest(HttpContent flareSolverrRequest)
         {
             FlareSolverrResponse result = null;
 
@@ -37,7 +75,7 @@ namespace FlareSolverrSharp.Solvers
                 try
                 {
                     _httpClient = new HttpClient();
-                    response = await _httpClient.PostAsync(_flareSolverrUri, GenerateFlareSolverrRequest(request));
+                    response = await _httpClient.PostAsync(_flareSolverrUri, flareSolverrRequest);
                 }
                 catch (HttpRequestException e)
                 {
@@ -104,12 +142,8 @@ namespace FlareSolverrSharp.Solvers
             return result;
         }
 
-        private HttpContent GenerateFlareSolverrRequest(HttpRequestMessage request)
+        private FlareSolverrRequestProxy GetProxy()
         {
-            FlareSolverrRequest req;
-
-            var url = request.RequestUri.ToString();
-
             FlareSolverrRequestProxy proxy = null;
             if (!string.IsNullOrWhiteSpace(ProxyUrl))
             {
@@ -118,6 +152,26 @@ namespace FlareSolverrSharp.Solvers
                     Url = ProxyUrl
                 };
             }
+            return proxy;
+        }
+
+        private HttpContent GetSolverRequestContent(FlareSolverrRequest request)
+        {
+            var payload = JsonConvert.SerializeObject(request, new JsonSerializerSettings
+            {
+                NullValueHandling = NullValueHandling.Ignore
+            });
+            HttpContent content = new StringContent(payload, Encoding.UTF8, "application/json");
+            return content;
+        }
+
+        private HttpContent GenerateFlareSolverrRequest(HttpRequestMessage request)
+        {
+            FlareSolverrRequest req;
+
+            var url = request.RequestUri.ToString();
+
+            FlareSolverrRequestProxy proxy = GetProxy();
 
             if (request.Method == HttpMethod.Get)
             {
@@ -163,12 +217,7 @@ namespace FlareSolverrSharp.Solvers
                 throw new FlareSolverrException("Unsupported HttpMethod: " + request.Method);
             }
 
-            var payload = JsonConvert.SerializeObject(req, new JsonSerializerSettings
-            {
-                NullValueHandling = NullValueHandling.Ignore
-            });
-            HttpContent content = new StringContent(payload, Encoding.UTF8, "application/json");
-            return content;
+            return GetSolverRequestContent(req);
         }
  
     }

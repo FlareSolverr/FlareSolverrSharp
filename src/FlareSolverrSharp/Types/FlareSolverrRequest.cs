@@ -10,6 +10,9 @@ namespace FlareSolverrSharp.Types
         [JsonProperty("url")]
         public string Url;
 
+        [JsonProperty("session")]
+        public string Session;
+
         [JsonProperty("proxy")]
         public FlareSolverrRequestProxy Proxy;
     }

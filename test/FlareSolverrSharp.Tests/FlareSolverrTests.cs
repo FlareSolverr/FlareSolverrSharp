@@ -170,5 +170,26 @@ namespace FlareSolverrSharp.Tests
                 Assert.Fail("Unexpected exception: " + e);
             }
         }
+        [TestMethod]
+        public async Task SolveTestSessions()
+        {
+            var flareSolverr = new FlareSolverr(Settings.FlareSolverrApiUrl);
+            var flareSolverrResponse = await flareSolverr.CreateSession();
+
+            Assert.AreEqual("ok", flareSolverrResponse.Status);
+            Assert.AreEqual("Session created successfully.", flareSolverrResponse.Message);
+            Assert.IsTrue(flareSolverrResponse.StartTimestamp > 0);
+            Assert.IsTrue(flareSolverrResponse.EndTimestamp > flareSolverrResponse.StartTimestamp);
+            Assert.IsTrue(flareSolverrResponse.Version.Contains("2."));
+
+            var sessionID = flareSolverrResponse.Session;
+
+            flareSolverrResponse = await flareSolverr.ListSessions();
+            Assert.AreEqual("ok", flareSolverrResponse.Status);
+            Assert.IsTrue(flareSolverrResponse.Sessions.Contains(sessionID));
+
+            flareSolverrResponse = await flareSolverr.DestroySession(sessionID);
+            Assert.AreEqual("ok", flareSolverrResponse.Status);
+        }
     }
 }
