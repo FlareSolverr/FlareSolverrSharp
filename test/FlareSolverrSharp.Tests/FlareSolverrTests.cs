@@ -173,6 +173,7 @@ namespace FlareSolverrSharp.Tests
         [TestMethod]
         public async Task SolveTestSessions()
         {
+            // create new session
             var flareSolverr = new FlareSolverr(Settings.FlareSolverrApiUrl);
             var flareSolverrResponse = await flareSolverr.CreateSession();
 
@@ -181,14 +182,23 @@ namespace FlareSolverrSharp.Tests
             Assert.IsTrue(flareSolverrResponse.StartTimestamp > 0);
             Assert.IsTrue(flareSolverrResponse.EndTimestamp > flareSolverrResponse.StartTimestamp);
             Assert.IsTrue(flareSolverrResponse.Version.Contains("2."));
+            Assert.IsTrue(flareSolverrResponse.Session.Length > 0);
 
-            var sessionID = flareSolverrResponse.Session;
+            // request with session
+            var sessionId = flareSolverrResponse.Session;
+            var uri = new Uri("https://www.google.com/");
+            var request = new HttpRequestMessage(HttpMethod.Get, uri);
+            flareSolverrResponse = await flareSolverr.Solve(request, sessionId);
+            Assert.AreEqual("ok", flareSolverrResponse.Status);
+            Assert.AreEqual("200", flareSolverrResponse.Solution.Status);
 
+            // list sessions
             flareSolverrResponse = await flareSolverr.ListSessions();
             Assert.AreEqual("ok", flareSolverrResponse.Status);
-            Assert.IsTrue(flareSolverrResponse.Sessions.Contains(sessionID));
+            Assert.IsTrue(flareSolverrResponse.Sessions.Contains(sessionId));
 
-            flareSolverrResponse = await flareSolverr.DestroySession(sessionID);
+            // destroy session
+            flareSolverrResponse = await flareSolverr.DestroySession(sessionId);
             Assert.AreEqual("ok", flareSolverrResponse.Status);
         }
     }

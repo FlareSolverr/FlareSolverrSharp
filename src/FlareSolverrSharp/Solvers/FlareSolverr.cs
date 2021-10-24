@@ -26,9 +26,10 @@ namespace FlareSolverrSharp.Solvers
                 apiUrl += "/";
             _flareSolverrUri = new Uri(apiUrl + "v1");
         }
-        public async Task<FlareSolverrResponse> Solve(HttpRequestMessage request, String sessionID = "")
+
+        public async Task<FlareSolverrResponse> Solve(HttpRequestMessage request, string sessionId = "")
         {
-            return await SendFlareSolverrRequest(GenerateFlareSolverrRequest(request, sessionID));
+            return await SendFlareSolverrRequest(GenerateFlareSolverrRequest(request, sessionId));
         }
 
         public async Task<FlareSolverrResponse> CreateSession()
@@ -53,14 +54,14 @@ namespace FlareSolverrSharp.Solvers
             return await SendFlareSolverrRequest(GetSolverRequestContent(req));
         }
 
-        public async Task<FlareSolverrResponse> DestroySession(String sessionID)
+        public async Task<FlareSolverrResponse> DestroySession(string sessionId)
         {
             var req = new FlareSolverrRequestGet
             {
                 Cmd = "sessions.destroy",
                 MaxTimeout = MaxTimeout,
                 Proxy = GetProxy(),
-                Session = sessionID
+                Session = sessionId
             };
             return await SendFlareSolverrRequest(GetSolverRequestContent(req));
         }
@@ -165,11 +166,11 @@ namespace FlareSolverrSharp.Solvers
             return content;
         }
 
-        private HttpContent GenerateFlareSolverrRequest(HttpRequestMessage request, String sessionID = "")
+        private HttpContent GenerateFlareSolverrRequest(HttpRequestMessage request, string sessionId = "")
         {
             FlareSolverrRequest req;
-            if (String.IsNullOrWhiteSpace(sessionID))
-                sessionID = null; 
+            if (string.IsNullOrWhiteSpace(sessionId))
+                sessionId = null; 
 
             var url = request.RequestUri.ToString();
 
@@ -183,7 +184,7 @@ namespace FlareSolverrSharp.Solvers
                     Url = url,
                     MaxTimeout = MaxTimeout,
                     Proxy = proxy,
-                    Session = sessionID
+                    Session = sessionId
                 };
             }
             else if (request.Method == HttpMethod.Post)
@@ -198,7 +199,7 @@ namespace FlareSolverrSharp.Solvers
                         PostData = request.Content.ReadAsStringAsync().Result,
                         MaxTimeout = MaxTimeout,
                         Proxy = proxy,
-                        Session = sessionID
+                        Session = sessionId
                     };
                 }
                 else if (contentTypeType == typeof(MultipartFormDataContent))
