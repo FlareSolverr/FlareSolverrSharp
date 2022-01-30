@@ -96,6 +96,35 @@ namespace FlareSolverrSharp.Tests
         }
 
         [TestMethod]
+        public async Task SolveOkCloudflareDDoSGuardGet()
+        {
+            var handler = new ClearanceHandler(Settings.FlareSolverrApiUrl)
+            {
+                MaxTimeout = 60000
+            };
+
+            var client = new HttpClient(handler);
+            var response = await client.GetAsync(Settings.ProtectedDdgUri);
+            Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
+            Assert.IsTrue(!response.Content.ReadAsStringAsync().Result.ToLower().Contains("ddos"));
+        }
+
+        [TestMethod]
+        public async Task SolveOkCloudflareCustomGet()
+        {
+            // Custom CloudFlare for EbookParadijs, Film-Paleis, MuziekFabriek and Puur-Hollands
+            var handler = new ClearanceHandler(Settings.FlareSolverrApiUrl)
+            {
+                MaxTimeout = 60000
+            };
+
+            var client = new HttpClient(handler);
+            var response = await client.GetAsync(Settings.ProtectedCcfUri);
+            Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
+            Assert.IsTrue(!response.Content.ReadAsStringAsync().Result.ToLower().Contains("ddos"));
+        }
+
+        [TestMethod]
         public async Task SolveErrorUrl()
         {
             var uri = new Uri("https://www.google.bad1/");
