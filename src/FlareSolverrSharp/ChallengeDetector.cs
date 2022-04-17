@@ -7,7 +7,11 @@ namespace FlareSolverrSharp
 {
     public static class ChallengeDetector
     {
-        private static readonly HashSet<string> CloudflareServerNames = new HashSet<string>{"cloudflare", "cloudflare-nginx"};
+        private static readonly HashSet<string> CloudflareServerNames = new HashSet<string>{
+        "cloudflare",
+        "cloudflare-nginx",
+        "ddos-guard"
+        };
 
         /// <summary>
         /// Checks if clearance is required.
