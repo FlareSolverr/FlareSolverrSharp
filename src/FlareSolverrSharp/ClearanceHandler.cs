@@ -129,23 +129,45 @@ namespace FlareSolverrSharp
 
         private void InjectCookies(HttpRequestMessage request, FlareSolverrResponse flareSolverrResponse)
         {
-            var rCookies = flareSolverrResponse.Solution.Cookies;
-            if (!rCookies.Any())
+            var flareCookies = flareSolverrResponse.Solution.Cookies;
+            if (!flareCookies.Any())
                 return;
-            var rCookiesList = rCookies.Select(x => x.Name).ToList();
 
             if (HttpClientHandler.UseCookies)
             {
-                var oldCookies = HttpClientHandler.CookieContainer.GetCookies(request.RequestUri);
-                foreach (Cookie oldCookie in oldCookies)
-                    if (rCookiesList.Contains(oldCookie.Name))
-                        oldCookie.Expired = true;
-                foreach (var rCookie in rCookies)
+                var currentCookies = HttpClientHandler.CookieContainer.GetCookies(request.RequestUri);
+
+                // remove previous FlareSolverr cookies
+                var expiredCount = 0;
+                foreach (var flareCookie in flareCookies)
+                {
+                    var cookie = currentCookies[flareCookie.Name];
+                    if (cookie == null)
+                        continue;
+                    cookie.Expired = true;
+                    expiredCount += 1;
+                }
+
+                // there is a max number of cookies, we have to make space (we assume the first
+                var cookieExcess = currentCookies.Count + flareCookies.Length
+                                   - expiredCount - HttpClientHandler.CookieContainer.PerDomainCapacity;
+                foreach (Cookie cookie in currentCookies)
+                {
+                    if (cookieExcess == 0)
+                        break;
+                    if (cookie.Expired)
+                        continue;
+                    cookie.Expired = true;
+                    cookieExcess -= 1;
+                }
+
+                // add FlareSolverr cookies
+                foreach (var rCookie in flareCookies)
                     HttpClientHandler.CookieContainer.Add(request.RequestUri, rCookie.ToCookieObj());
             }
             else
             {
-                foreach (var rCookie in rCookies)
+                foreach (var rCookie in flareCookies)
                     request.Headers.Add(HttpHeaders.Cookie, rCookie.ToHeaderValue());
             }
         }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -40,6 +41,48 @@ namespace FlareSolverrSharp.Tests
             var client = new HttpClient(handler);
             var response = await client.GetAsync(Settings.ProtectedUri);
             Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
+        }
+
+        [TestMethod]
+        public async Task SolveOkCloudflareGetManyCookies()
+        {
+            // there is a limit in the maximum number of cookies that CookieContainer could have
+            // we implemented some logic to add Cloudflare cookies even if the container is full
+            // prepare a container full of cookies
+            var url = Settings.ProtectedUri;
+            var cookiesContainer = new CookieContainer
+            {
+                PerDomainCapacity = 5 // by default is 25
+            };
+            var cookieUrl = new Uri(url.Scheme + "://" + url.Host);
+            for (var i = 0; i < 6; i++)
+                cookiesContainer.Add(cookieUrl, new Cookie($"cookie{i}", $"value{i}"));
+            var cookies = cookiesContainer.GetCookies(url);
+            Assert.AreEqual(5, cookies.Count); // the first cookie0 is lost
+            Assert.AreEqual("cookie1", cookies.First().Name);
+
+            // prepare the client
+            var clientHandler = new HttpClientHandler
+            {
+                CookieContainer = cookiesContainer,
+                AllowAutoRedirect = false, // Do not use this - Bugs ahoy! Lost cookies and more.
+                UseCookies = true,
+                AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate
+            };
+            var handler = new ClearanceHandler(Settings.FlareSolverrApiUrl)
+            {
+                MaxTimeout = 60000
+            };
+            handler.InnerHandler = clientHandler;
+
+            var client = new HttpClient(handler);
+            var response = await client.GetAsync(url);
+            Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
+
+            // we check the cookies again
+            cookies = cookiesContainer.GetCookies(url);
+            Assert.AreEqual(5, cookies.Count); 
+            Assert.IsNotNull(cookies["cf_clearance"]);
         }
 
         [TestMethod]
