@@ -190,8 +190,9 @@ namespace FlareSolverrSharp.Solvers
             }
             else if (request.Method == HttpMethod.Post)
             {
-                var contentTypeType = request.Content.GetType();
-                if (contentTypeType == typeof(FormUrlEncodedContent))
+                // request.Content.GetType() doesn't work well when encoding != utf-8
+                var contentMediaType = request.Content.Headers.ContentType?.MediaType.ToLower() ?? "<null>";
+                if (contentMediaType.Contains("application/x-www-form-urlencoded"))
                 {
                     req = new FlareSolverrRequestPost
                     {
@@ -203,19 +204,15 @@ namespace FlareSolverrSharp.Solvers
                         Session = sessionId
                     };
                 }
-                else if (contentTypeType == typeof(MultipartFormDataContent))
+                else if (contentMediaType.Contains("multipart/form-data")
+                         || contentMediaType.Contains("text/html"))
                 {
                     //TODO Implement - check if we just need to pass the content-type with the relevant headers
-                    throw new FlareSolverrException("Unimplemented POST Content-Type: " + request.Content.Headers.ContentType);
-                }
-                else if (contentTypeType == typeof(StringContent))
-                {
-                    //TODO Implement - check if we just need to pass the content-type with the relevant headers
-                    throw new FlareSolverrException("Unimplemented POST Content-Type: " + request.Content.Headers.ContentType);
+                    throw new FlareSolverrException("Unimplemented POST Content-Type: " + contentMediaType);
                 }
                 else
                 {
-                    throw new FlareSolverrException("Unsupported POST Content-Type: " + request.Content.Headers.ContentType);
+                    throw new FlareSolverrException("Unsupported POST Content-Type: " + contentMediaType);
                 }
             }
             else
