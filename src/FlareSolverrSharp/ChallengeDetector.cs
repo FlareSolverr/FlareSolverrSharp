@@ -34,8 +34,11 @@ namespace FlareSolverrSharp
 
             // detect CloudFlare and DDoS-GUARD
             if (response.StatusCode.Equals(HttpStatusCode.ServiceUnavailable) ||
-                response.StatusCode.Equals(HttpStatusCode.Forbidden))
-                return true; // Defected CloudFlare and DDoS-GUARD
+                 response.StatusCode.Equals(HttpStatusCode.Forbidden)) {
+                var responseHtml = response.Content.ReadAsStringAsync().Result;
+                if (responseHtml.Contains("<title>Just a moment...") || responseHtml.Contains("<title>DDOS-GUARD"))
+                    return true;
+            }
 
             // detect Custom CloudFlare for EbookParadijs, Film-Paleis, MuziekFabriek and Puur-Hollands
             if (response.Headers.Vary.ToString() == "Accept-Encoding,User-Agent" &&
