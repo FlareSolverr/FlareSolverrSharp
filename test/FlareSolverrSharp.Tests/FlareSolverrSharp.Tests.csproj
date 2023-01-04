@@ -5,7 +5,7 @@
     <IsPackable>false</IsPackable>
     <AssemblyName>FlareSolverrSharp.Tests</AssemblyName>
     <RootNamespace>FlareSolverrSharp.Tests</RootNamespace>
-    <Version>2.2.6</Version>
+    <Version>3.0.0</Version>
   </PropertyGroup>
 
   <ItemGroup>
