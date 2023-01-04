@@ -95,7 +95,7 @@ namespace FlareSolverrSharp.Tests
 
             var request = new HttpRequestMessage();
             request.Headers.ExpectContinue = false;
-            request.RequestUri = Settings.ProtectedUri;
+            request.RequestUri = Settings.ProtectedPostUri;
             var postData = new Dictionary<string, string> { { "story", "test" }};
             request.Content = FormUrlEncodedContentWithEncoding(postData, Encoding.UTF8);
             request.Method = HttpMethod.Post;
@@ -114,14 +114,14 @@ namespace FlareSolverrSharp.Tests
             };
 
             var request = new HttpRequestMessage(HttpMethod.Get, Settings.ProtectedUri);
-            request.Headers.UserAgent.ParseAdd("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4044.138 Safari/537.36");
+            request.Headers.UserAgent.ParseAdd("Mozilla/5.0 (X11; Linux x86_64; rv:108.0) Gecko/20100101 Firefox/108.0");
 
             var client = new HttpClient(handler);
             var response = await client.SendAsync(request);
             Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
 
             // The request User-Agent will be replaced with FlareSolverr User-Agent
-            Assert.IsTrue(request.Headers.UserAgent.ToString().Contains("Firefox/"));
+            Assert.IsTrue(request.Headers.UserAgent.ToString().Contains("Chrome/"));
         }
 
         [TestMethod]
@@ -299,7 +299,7 @@ namespace FlareSolverrSharp.Tests
             }
             catch (HttpRequestException e)
             {
-                Assert.IsTrue(e.Message.Contains("FlareSolverr was unable to process the request, please check FlareSolverr logs. Message: Error: Unable to process browser request. Error: Maximum timeout reached. maxTimeout=100 (ms)"));
+                Assert.IsTrue(e.Message.Contains("The request was canceled due to the configured HttpClient.Timeout of 0.1 seconds elapsing"));
             }
             catch (Exception e)
             {

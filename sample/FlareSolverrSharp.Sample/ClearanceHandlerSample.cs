@@ -12,7 +12,7 @@ namespace FlareSolverrSharp.Sample
     {
 
         public static string FlareSolverrUrl = "http://localhost:8191/";
-        public static string ProtectedUrl = "https://pirateiro.com/torrents/?search=harry";
+        public static string ProtectedUrl = "https://badasstorrents.com/torrents/search/720p/date/desc";
 
         public static async Task SampleGet()
         {
