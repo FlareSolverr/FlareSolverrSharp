@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFramework>net7.0</TargetFramework>
     <RootNamespace>FlareSolverrSharp.Sample</RootNamespace>
     <AssemblyName>FlareSolverrSharp.Sample</AssemblyName>
     <Version>2.2.6</Version>
