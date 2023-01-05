@@ -76,8 +76,8 @@ namespace FlareSolverrSharp.Solvers
                 try
                 {
                     _httpClient = new HttpClient();
-                    // wait 2 more seconds to make sure we return the FlareSolverr timeout message
-                    _httpClient.Timeout = TimeSpan.FromMilliseconds(MaxTimeout + 2000);
+                    // wait 5 more seconds to make sure we return the FlareSolverr timeout message
+                    _httpClient.Timeout = TimeSpan.FromMilliseconds(MaxTimeout + 5000);
                     response = await _httpClient.PostAsync(_flareSolverrUri, flareSolverrRequest);
                 }
                 catch (HttpRequestException e)
