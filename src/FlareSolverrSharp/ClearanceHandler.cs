@@ -129,7 +129,14 @@ namespace FlareSolverrSharp
 
         private void InjectCookies(HttpRequestMessage request, FlareSolverrResponse flareSolverrResponse)
         {
-            var flareCookies = flareSolverrResponse.Solution.Cookies;
+            var flareCookies = flareSolverrResponse.Solution.Cookies.ToList();
+
+            // use only Cloudflare and DDoS-GUARD cookies
+            flareCookies = flareCookies.Where(cookie =>
+                cookie.Name.StartsWith("cf_")
+                || cookie.Name.StartsWith("__cf")
+                || cookie.Name.StartsWith("__ddg")).ToList();
+
             if (!flareCookies.Any())
                 return;
 
@@ -149,7 +156,7 @@ namespace FlareSolverrSharp
                 }
 
                 // there is a max number of cookies, we have to make space (we assume the first
-                var cookieExcess = currentCookies.Count + flareCookies.Length
+                var cookieExcess = currentCookies.Count + flareCookies.Count
                                    - expiredCount - HttpClientHandler.CookieContainer.PerDomainCapacity;
                 foreach (Cookie cookie in currentCookies)
                 {
