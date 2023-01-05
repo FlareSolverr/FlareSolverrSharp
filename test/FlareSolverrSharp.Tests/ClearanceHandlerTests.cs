@@ -288,7 +288,7 @@ namespace FlareSolverrSharp.Tests
         {
             var handler = new ClearanceHandler(Settings.FlareSolverrApiUrl)
             {
-                MaxTimeout = 100
+                MaxTimeout = 200
             };
 
             var client = new HttpClient(handler);
@@ -299,7 +299,7 @@ namespace FlareSolverrSharp.Tests
             }
             catch (HttpRequestException e)
             {
-                Assert.IsTrue(e.Message.Contains("The request was canceled due to the configured HttpClient.Timeout of 0.1 seconds elapsing"));
+                Assert.IsTrue(e.Message.Contains("FlareSolverr was unable to process the request, please check FlareSolverr logs. Message: Error: Error solving the challenge. Timeout after 0.2 seconds."));
             }
             catch (Exception e)
             {
