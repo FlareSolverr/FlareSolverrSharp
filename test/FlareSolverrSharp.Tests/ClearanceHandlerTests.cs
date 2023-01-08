@@ -168,6 +168,30 @@ namespace FlareSolverrSharp.Tests
         }
 
         [TestMethod]
+        public async Task SolveErrorCloudflareBlockedGet()
+        {
+            var handler = new ClearanceHandler(Settings.FlareSolverrApiUrl)
+            {
+                MaxTimeout = 60000
+            };
+
+            var client = new HttpClient(handler);
+            try
+            {
+                await client.GetAsync(Settings.ProtectedBlockedUri);
+                Assert.Fail("Exception not thrown");
+            }
+            catch (FlareSolverrException e)
+            {
+                Assert.IsTrue(e.Message.Contains("Error solving the challenge. Cloudflare has blocked this request. Probably your IP is banned for this site"));
+            }
+            catch (Exception e)
+            {
+                Assert.Fail("Unexpected exception: " + e);
+            }
+        }
+
+        [TestMethod]
         public async Task SolveErrorUrl()
         {
             var uri = new Uri("https://www.google.bad1/");

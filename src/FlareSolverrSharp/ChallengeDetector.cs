@@ -36,7 +36,11 @@ namespace FlareSolverrSharp
             if (response.StatusCode.Equals(HttpStatusCode.ServiceUnavailable) ||
                  response.StatusCode.Equals(HttpStatusCode.Forbidden)) {
                 var responseHtml = response.Content.ReadAsStringAsync().Result;
-                if (responseHtml.Contains("<title>Just a moment...") || responseHtml.Contains("<title>DDOS-GUARD"))
+                if (responseHtml.Contains("<title>Just a moment...</title>") || // Cloudflare
+                    responseHtml.Contains("<title>Access denied</title>") || // Cloudflare Blocked
+                    responseHtml.Contains("<title>Attention Required! | Cloudflare</title>") || // Cloudflare Blocked
+                    responseHtml.Trim().Equals("error code: 1020") || // Cloudflare Blocked
+                    responseHtml.Contains("<title>DDOS-GUARD</title>")) // DDOS-GUARD
                     return true;
             }
 
