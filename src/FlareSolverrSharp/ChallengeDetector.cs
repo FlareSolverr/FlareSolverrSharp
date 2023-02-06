@@ -40,7 +40,8 @@ namespace FlareSolverrSharp
                     responseHtml.Contains("<title>Access denied</title>") || // Cloudflare Blocked
                     responseHtml.Contains("<title>Attention Required! | Cloudflare</title>") || // Cloudflare Blocked
                     responseHtml.Trim().Equals("error code: 1020") || // Cloudflare Blocked
-                    responseHtml.Contains("<title>DDOS-GUARD</title>")) // DDOS-GUARD
+                    responseHtml.Contains("<title>DDOS-GUARD</title>") || // DDOS-GUARD A
+                    responseHtml.Contains("<title>DDoS-Guard</title>"))   // DDOS-GUARD B
                     return true;
             }
 
