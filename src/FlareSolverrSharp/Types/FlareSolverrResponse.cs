@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json;
+﻿using System.Text.Json.Serialization;
 
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnassignedField.Global
@@ -7,38 +7,77 @@ namespace FlareSolverrSharp.Types
 {
     public class FlareSolverrResponse
     {
-        public string Status;
-        public string Message;
-        public long StartTimestamp;
-        public long EndTimestamp;
-        public string Version;
-        public Solution Solution;
-        public string Session;
-        public string[] Sessions;
+        [JsonPropertyName("status")]
+        public string Status { get; set; }
+
+        [JsonPropertyName("message")]
+        public string Message { get; set; }
+        
+        [JsonPropertyName("startTimestamp")]
+        public long StartTimestamp { get; set; }
+
+        [JsonPropertyName("endTimestamp")]
+        public long EndTimestamp { get; set; }
+
+        [JsonPropertyName("version")]
+        public string Version { get; set; }
+
+        [JsonPropertyName("solution")]
+        public Solution Solution { get; set; }
     }
 
     public class Solution
     {
-        public string Url;
-        public string Status;
-        public Headers Headers;
-        public string Response;
-        public Cookie[] Cookies;
-        public string UserAgent;
+        [JsonPropertyName("url")]
+        public string Url { get; set; }
+
+        [JsonPropertyName("status")]
+        public int Status { get; set; }
+
+        [JsonPropertyName("headers")]
+        public Headers Headers { get; set; }
+
+        [JsonPropertyName("response")]
+        public string Response { get; set; }
+
+        [JsonPropertyName("cookies")]
+        public Cookie[] Cookies { get; set; }
+
+        [JsonPropertyName("userAgent")]
+        public string UserAgent { get; set; }
     }
 
     public class Cookie
     {
-        public string Name;
-        public string Value;
-        public string Domain;
-        public string Path;
-        public double Expires;
-        public int Size;
-        public bool HttpOnly;
-        public bool Secure;
-        public bool Session;
-        public string SameSite;
+        [JsonPropertyName("name")]
+        public string Name { get; set; }
+
+        [JsonPropertyName("value")]
+        public string Value { get; set; }
+
+        [JsonPropertyName("domain")]
+        public string Domain { get; set; }
+        
+        [JsonPropertyName("path")]
+        public string Path { get; set; }
+
+        [JsonPropertyName("expiry")]
+        public double Expires { get; set; }
+
+        [JsonPropertyName("size")]
+        public int Size { get; set; }
+        
+        [JsonPropertyName("httpOnly")]
+        public bool HttpOnly { get; set; }
+
+        [JsonPropertyName("secure")]
+        public bool Secure { get; set; }
+
+        [JsonPropertyName("session")]
+        public bool Session { get; set; }
+
+        [JsonPropertyName("sameSite")]
+        public string SameSite { get; set; }
 
         public string ToHeaderValue() => $"{Name}={Value}";
         public System.Net.Cookie ToCookieObj() => new System.Net.Cookie(Name, Value);
@@ -47,9 +86,13 @@ namespace FlareSolverrSharp.Types
 
     public class Headers
     {
-        public string Status;
-        public string Date;
-        [JsonProperty(PropertyName = "content-type")]
-        public string ContentType;
+        [JsonPropertyName("status")]
+        public string Status { get; set; }
+        
+        [JsonPropertyName("date")]
+        public string Date { get; set; }
+
+        [JsonPropertyName("content-type")]
+        public string ContentType { get; set; }
     }
 }
