@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json;
+﻿using System.Text.Json.Serialization;
 
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnassignedField.Global
@@ -49,7 +49,7 @@ namespace FlareSolverrSharp.Types
     {
         public string Status;
         public string Date;
-        [JsonProperty(PropertyName = "content-type")]
+        [JsonPropertyName("content-type")]
         public string ContentType;
     }
 }

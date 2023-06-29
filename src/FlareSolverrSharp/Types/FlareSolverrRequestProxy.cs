@@ -1,10 +1,10 @@
-﻿using Newtonsoft.Json;
+﻿using System.Text.Json.Serialization;
 
 namespace FlareSolverrSharp.Types
 {
     public class FlareSolverrRequestProxy
     {
-        [JsonProperty("url")]
+        [JsonPropertyName("url")]
         public string Url;
     }
 }

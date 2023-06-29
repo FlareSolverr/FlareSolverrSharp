@@ -1,13 +1,13 @@
-﻿using Newtonsoft.Json;
+﻿using System.Text.Json.Serialization;
 
 namespace FlareSolverrSharp.Types
 {
     public class FlareSolverrRequestPost : FlareSolverrRequest
     {
-        [JsonProperty("postData")]
+        [JsonPropertyName("postData")]
         public string PostData;
 
-        [JsonProperty("maxTimeout")]
+        [JsonPropertyName("maxTimeout")]
         public int MaxTimeout;
     }
 }

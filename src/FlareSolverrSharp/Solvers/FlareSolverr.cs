@@ -2,11 +2,11 @@
 using System.Net;
 using System.Net.Http;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 using FlareSolverrSharp.Exceptions;
 using FlareSolverrSharp.Types;
 using FlareSolverrSharp.Utilities;
-using Newtonsoft.Json;
 
 namespace FlareSolverrSharp.Solvers
 {
@@ -102,7 +102,9 @@ namespace FlareSolverrSharp.Solvers
                 var resContent = await response.Content.ReadAsStringAsync();
                 try
                 {
-                    result = JsonConvert.DeserializeObject<FlareSolverrResponse>(resContent);
+                    result = JsonSerializer.Deserialize(
+                        resContent,
+                        FlareSolverrContext.Default.FlareSolverrResponse);
                 }
                 catch (Exception)
                 {
@@ -160,10 +162,9 @@ namespace FlareSolverrSharp.Solvers
 
         private HttpContent GetSolverRequestContent(FlareSolverrRequest request)
         {
-            var payload = JsonConvert.SerializeObject(request, new JsonSerializerSettings
-            {
-                NullValueHandling = NullValueHandling.Ignore
-            });
+            var payload = JsonSerializer.Serialize(
+                request,
+                FlareSolverrContext.Default.FlareSolverrRequest);
             HttpContent content = new StringContent(payload, Encoding.UTF8, "application/json");
             return content;
         }
