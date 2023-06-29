@@ -2,6 +2,8 @@
 
 namespace FlareSolverrSharp.Types
 {
+    [JsonDerivedType(typeof(FlareSolverrRequestGet))]
+    [JsonDerivedType(typeof(FlareSolverrRequestPost))]
     public class FlareSolverrRequest
     {
         [JsonPropertyName("cmd")]
