@@ -107,14 +107,8 @@ namespace FlareSolverrSharp
             
             // Check if saved response exists.
             var flareSolverrResponse = await _responseStorage.LoadAsync();
-            bool isNewResponse = true;
 
-            if (flareSolverrResponse == null)
-            {
-                // Resolve the challenge using FlareSolverr API
-                flareSolverrResponse = await _flareSolverr.Solve(request);
-            }
-            else
+            if (flareSolverrResponse != null)
             {
                 // Set user agent
                 if (flareSolverrResponse.Solution.UserAgent != null &&
@@ -128,16 +122,16 @@ namespace FlareSolverrSharp
                 InjectCookies(request, flareSolverrResponse);
                 response = await base.SendAsync(request, cancellationToken).ConfigureAwait(false);
 
-                if (ChallengeDetector.IsClearanceRequired(response))
+                if (!ChallengeDetector.IsClearanceRequired(response))
                 {
-                    // Resolve the challenge using FlareSolverr API
-                    flareSolverrResponse = await _flareSolverr.Solve(request);
-                }
-                else
-                {
-                    isNewResponse = false;
+                    // Success with saved response.
+                    InjectSetCookieHeader(response, flareSolverrResponse);
+                    return response;
                 }
             }
+
+            // Resolve the challenge using FlareSolverr API
+            flareSolverrResponse = await _flareSolverr.Solve(request);
 
             // Save the FlareSolverr User-Agent for the following requests
             var flareSolverUserAgent = flareSolverrResponse.Solution.UserAgent;
@@ -159,11 +153,7 @@ namespace FlareSolverrSharp
 
             // Add the "Set-Cookie" header in the response with the cookies provided by FlareSolverr
             InjectSetCookieHeader(response, flareSolverrResponse);
-
-            if (isNewResponse)
-            {
-                await _responseStorage.SaveAsync(flareSolverrResponse);
-            }
+            await _responseStorage.SaveAsync(flareSolverrResponse);
 
             return response;
         }
