@@ -6,14 +6,14 @@ namespace FlareSolverrSharp
     public interface IFlaresolverrResponseStorage
     {
         Task SaveAsync(FlareSolverrResponse result);
-        Task<FlareSolverrResponse> LoadAsync();
+        Task<FlareSolverrResponse?> LoadAsync();
     }
 
     public class DefaultFlaresolverrResponseStorage : IFlaresolverrResponseStorage
     {
-        public Task<FlareSolverrResponse> LoadAsync()
+        public Task<FlareSolverrResponse?> LoadAsync()
         {
-            return Task.FromResult<FlareSolverrResponse>(null);
+            return Task.FromResult<FlareSolverrResponse?>(null);
         }
 
         public Task SaveAsync(FlareSolverrResponse result)
