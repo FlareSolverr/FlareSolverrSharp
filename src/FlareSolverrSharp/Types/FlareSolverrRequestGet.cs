@@ -5,6 +5,6 @@ namespace FlareSolverrSharp.Types
     public class FlareSolverrRequestGet : FlareSolverrRequest
     {
         [JsonPropertyName("maxTimeout")]
-        public int MaxTimeout;
+        public int MaxTimeout  { get; set; }
     }
 }

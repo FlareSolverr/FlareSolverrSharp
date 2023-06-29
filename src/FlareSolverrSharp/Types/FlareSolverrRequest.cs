@@ -7,15 +7,15 @@ namespace FlareSolverrSharp.Types
     public class FlareSolverrRequest
     {
         [JsonPropertyName("cmd")]
-        public string Cmd;
+        public string Cmd { get; set; }
 
         [JsonPropertyName("url")]
-        public string Url;
+        public string Url { get; set; }
 
         [JsonPropertyName("session")]
-        public string Session;
+        public string Session { get; set; }
 
         [JsonPropertyName("proxy")]
-        public FlareSolverrRequestProxy Proxy;
+        public FlareSolverrRequestProxy Proxy { get; set; }
     }
 }

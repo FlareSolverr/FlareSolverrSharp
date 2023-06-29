@@ -5,6 +5,6 @@ namespace FlareSolverrSharp.Types
     public class FlareSolverrRequestProxy
     {
         [JsonPropertyName("url")]
-        public string Url;
+        public string Url  { get; set; }
     }
 }
