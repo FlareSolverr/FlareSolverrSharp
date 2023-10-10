@@ -29,20 +29,33 @@ namespace FlareSolverrSharp.Types
 
     public class Cookie
     {
+        [JsonProperty("name")]
         public string Name;
+
+        [JsonProperty("value")]
         public string Value;
+
+        [JsonProperty("domain")]
         public string Domain;
+
+        [JsonProperty("path")]
         public string Path;
-        public double Expires;
-        public int Size;
+
+        [JsonProperty("expiry", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        public int Expiry;
+
+        [JsonProperty("httpOnly", DefaultValueHandling = DefaultValueHandling.Ignore)]
         public bool HttpOnly;
+
+        [JsonProperty("secure", DefaultValueHandling = DefaultValueHandling.Ignore)]
         public bool Secure;
-        public bool Session;
+
+        [JsonProperty("sameSite")]
         public string SameSite;
 
         public string ToHeaderValue() => $"{Name}={Value}";
-        public System.Net.Cookie ToCookieObj() => new System.Net.Cookie(Name, Value);
 
+        public System.Net.Cookie ToCookieObj() => new System.Net.Cookie(Name, Value);
     }
 
     public class Headers

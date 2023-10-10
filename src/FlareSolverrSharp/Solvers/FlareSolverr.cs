@@ -27,9 +27,9 @@ namespace FlareSolverrSharp.Solvers
             _flareSolverrUri = new Uri(apiUrl + "v1");
         }
 
-        public async Task<FlareSolverrResponse> Solve(HttpRequestMessage request, string sessionId = "")
+        public async Task<FlareSolverrResponse> Solve(HttpRequestMessage request, string sessionId = "", Types.Cookie[] cookies = null)
         {
-            return await SendFlareSolverrRequest(GenerateFlareSolverrRequest(request, sessionId));
+            return await SendFlareSolverrRequest(GenerateFlareSolverrRequest(request, sessionId, cookies));
         }
 
         public async Task<FlareSolverrResponse> CreateSession()
@@ -168,11 +168,11 @@ namespace FlareSolverrSharp.Solvers
             return content;
         }
 
-        private HttpContent GenerateFlareSolverrRequest(HttpRequestMessage request, string sessionId = "")
+        private HttpContent GenerateFlareSolverrRequest(HttpRequestMessage request, string sessionId = "", Types.Cookie[] cookies = null)
         {
             FlareSolverrRequest req;
             if (string.IsNullOrWhiteSpace(sessionId))
-                sessionId = null; 
+                sessionId = null;
 
             var url = request.RequestUri.ToString();
 
@@ -186,7 +186,8 @@ namespace FlareSolverrSharp.Solvers
                     Url = url,
                     MaxTimeout = MaxTimeout,
                     Proxy = proxy,
-                    Session = sessionId
+                    Session = sessionId,
+                    Cookies = cookies
                 };
             }
             else if (request.Method == HttpMethod.Post)
@@ -202,7 +203,8 @@ namespace FlareSolverrSharp.Solvers
                         PostData = request.Content.ReadAsStringAsync().Result,
                         MaxTimeout = MaxTimeout,
                         Proxy = proxy,
-                        Session = sessionId
+                        Session = sessionId,
+                        Cookies = cookies
                     };
                 }
                 else if (contentMediaType.Contains("multipart/form-data")
@@ -223,6 +225,5 @@ namespace FlareSolverrSharp.Solvers
 
             return GetSolverRequestContent(req);
         }
- 
     }
 }
