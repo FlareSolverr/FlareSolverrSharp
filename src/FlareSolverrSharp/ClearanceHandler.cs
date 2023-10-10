@@ -34,6 +34,16 @@ namespace FlareSolverrSharp
         /// </summary>
         public string ProxyUrl = "";
 
+        /// <summary>
+        /// HTTP Proxy Username.
+        /// </summary>
+        public string ProxyUsername = "";
+
+        /// <summary>
+        /// HTTP Proxy Password.
+        /// </summary>
+        public string ProxyPassword = "";
+
         private HttpClientHandler HttpClientHandler => InnerHandler.GetMostInnerHandler() as HttpClientHandler;
 
         /// <summary>
@@ -73,7 +83,9 @@ namespace FlareSolverrSharp
                 _flareSolverr = new FlareSolverr(_flareSolverrApiUrl)
                 {
                     MaxTimeout = MaxTimeout,
-                    ProxyUrl = ProxyUrl
+                    ProxyUrl = ProxyUrl,
+                    ProxyUsername = ProxyUsername,
+                    ProxyPassword = ProxyPassword
                 };
             }
 
