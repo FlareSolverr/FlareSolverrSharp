@@ -37,12 +37,12 @@ namespace FlareSolverrSharp
         /// <summary>
         /// HTTP Proxy Username.
         /// </summary>
-        public string ProxyUsername = "";
+        public string ProxyUsername = null;
 
         /// <summary>
         /// HTTP Proxy Password.
         /// </summary>
-        public string ProxyPassword = "";
+        public string ProxyPassword = null;
 
         private HttpClientHandler HttpClientHandler => InnerHandler.GetMostInnerHandler() as HttpClientHandler;
 
