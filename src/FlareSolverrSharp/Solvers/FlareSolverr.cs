@@ -176,7 +176,7 @@ namespace FlareSolverrSharp.Solvers
         {
             FlareSolverrRequest req;
             if (string.IsNullOrWhiteSpace(sessionId))
-                sessionId = null; 
+                sessionId = null;
 
             var url = request.RequestUri.ToString();
 
@@ -227,6 +227,6 @@ namespace FlareSolverrSharp.Solvers
 
             return GetSolverRequestContent(req);
         }
- 
+
     }
 }
