@@ -14,6 +14,7 @@ namespace FlareSolverrSharp.Solvers
     {
         private static readonly SemaphoreLocker Locker = new SemaphoreLocker();
         private HttpClient _httpClient;
+        private readonly Uri _flareSolverrIndexUri;
         private readonly Uri _flareSolverrUri;
 
         public int MaxTimeout = 60000;
@@ -24,6 +25,8 @@ namespace FlareSolverrSharp.Solvers
             var apiUrl = flareSolverrApiUrl;
             if (!apiUrl.EndsWith("/"))
                 apiUrl += "/";
+
+            _flareSolverrIndexUri = new Uri(apiUrl);
             _flareSolverrUri = new Uri(apiUrl + "v1");
         }
 
@@ -66,9 +69,51 @@ namespace FlareSolverrSharp.Solvers
             return await SendFlareSolverrRequest(GetSolverRequestContent(req));
         }
 
+        public Task<FlareSolverrIndexResponse> GetIndex()
+        {
+            return SendFlareSolverrRequestInternal<FlareSolverrIndexResponse>(null);
+        }
+
         private async Task<FlareSolverrResponse> SendFlareSolverrRequest(HttpContent flareSolverrRequest)
         {
-            FlareSolverrResponse result = null;
+            FlareSolverrResponse result = await SendFlareSolverrRequestInternal<FlareSolverrResponse>(flareSolverrRequest);
+
+            try
+            {
+                Enum.TryParse(result.Status, true, out FlareSolverrStatusCode returnStatusCode);
+
+                if (returnStatusCode.Equals(FlareSolverrStatusCode.ok))
+                {
+                    return result;
+                }
+
+                if (returnStatusCode.Equals(FlareSolverrStatusCode.warning))
+                {
+                    throw new FlareSolverrException(
+                        "FlareSolverr was able to process the request, but a captcha was detected. Message: "
+                        + result.Message);
+                }
+
+                if (returnStatusCode.Equals(FlareSolverrStatusCode.error))
+                {
+                    throw new FlareSolverrException(
+                        "FlareSolverr was unable to process the request, please check FlareSolverr logs. Message: "
+                        + result.Message);
+                }
+
+                throw new FlareSolverrException("Unable to map FlareSolverr returned status code, received code: "
+                    + result.Status + ". Message: " + result.Message);
+            }
+            catch (ArgumentException)
+            {
+                throw new FlareSolverrException("Error parsing status code, check FlareSolverr log. Status: "
+                        + result.Status + ". Message: " + result.Message);
+            }
+        }
+
+        private async Task<T> SendFlareSolverrRequestInternal<T>(HttpContent flareSolverrRequest)
+        {
+            T result = default;
 
             await Locker.LockAsync(async () =>
             {
@@ -76,9 +121,16 @@ namespace FlareSolverrSharp.Solvers
                 try
                 {
                     _httpClient = new HttpClient();
-                    // wait 5 more seconds to make sure we return the FlareSolverr timeout message
-                    _httpClient.Timeout = TimeSpan.FromMilliseconds(MaxTimeout + 5000);
-                    response = await _httpClient.PostAsync(_flareSolverrUri, flareSolverrRequest);
+                    if (flareSolverrRequest == null)
+                    {
+                        response = await _httpClient.GetAsync(_flareSolverrIndexUri);
+                    }
+                    else
+                    {
+                        // wait 5 more seconds to make sure we return the FlareSolverr timeout message
+                        _httpClient.Timeout = TimeSpan.FromMilliseconds(MaxTimeout + 5000);
+                        response = await _httpClient.PostAsync(_flareSolverrUri, flareSolverrRequest);
+                    }
                 }
                 catch (HttpRequestException e)
                 {
@@ -102,43 +154,11 @@ namespace FlareSolverrSharp.Solvers
                 var resContent = await response.Content.ReadAsStringAsync();
                 try
                 {
-                    result = JsonConvert.DeserializeObject<FlareSolverrResponse>(resContent);
+                    result = JsonConvert.DeserializeObject<T>(resContent);
                 }
                 catch (Exception)
                 {
                     throw new FlareSolverrException("Error parsing response, check FlareSolverr. Response: " + resContent);
-                }
-
-                try
-                {
-                    Enum.TryParse(result.Status, true, out FlareSolverrStatusCode returnStatusCode);
-
-                    if (returnStatusCode.Equals(FlareSolverrStatusCode.ok))
-                    {
-                        return result;
-                    }
-
-                    if (returnStatusCode.Equals(FlareSolverrStatusCode.warning))
-                    {
-                        throw new FlareSolverrException(
-                            "FlareSolverr was able to process the request, but a captcha was detected. Message: "
-                            + result.Message);
-                    }
-
-                    if (returnStatusCode.Equals(FlareSolverrStatusCode.error))
-                    {
-                        throw new FlareSolverrException(
-                            "FlareSolverr was unable to process the request, please check FlareSolverr logs. Message: "
-                            + result.Message);
-                    }
-
-                    throw new FlareSolverrException("Unable to map FlareSolverr returned status code, received code: "
-                        + result.Status + ". Message: " + result.Message);
-                }
-                catch (ArgumentException)
-                {
-                    throw new FlareSolverrException("Error parsing status code, check FlareSolverr log. Status: "
-                            + result.Status + ". Message: " + result.Message);
                 }
             });
 
@@ -172,7 +192,7 @@ namespace FlareSolverrSharp.Solvers
         {
             FlareSolverrRequest req;
             if (string.IsNullOrWhiteSpace(sessionId))
-                sessionId = null; 
+                sessionId = null;
 
             var url = request.RequestUri.ToString();
 
@@ -223,6 +243,5 @@ namespace FlareSolverrSharp.Solvers
 
             return GetSolverRequestContent(req);
         }
- 
     }
 }
