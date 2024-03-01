@@ -43,7 +43,9 @@ all websites as if they're not protected with anything.
 var handler = new ClearanceHandler("http://localhost:8191/")
 {
     MaxTimeout = 60000,
-    ProxyUrl = "http://127.0.0.1:8888"
+    ProxyUrl = "http://127.0.0.1:8888",
+    ProxyUsername = "cool_username",
+    ProxyPassword = "password4"
 };
 
 var client = new HttpClient(handler);
@@ -71,3 +73,13 @@ Example: 60000
 The ProxyUrl which will be sent to FlareSolverr.
 
 Example: http://127.0.0.1:8888
+
+### ProxyUsername
+The ProxyUsername which will be sent to FlareSolverr. (Only if ProxyUrl has been set)
+
+Use this if the proxy you're using requires authentication.
+
+### ProxyPassword
+The ProxyPassword which will be sent to FlareSolverr. (Only if ProxyUrl has been set)
+
+Use this if the proxy you're using requires authentication.
