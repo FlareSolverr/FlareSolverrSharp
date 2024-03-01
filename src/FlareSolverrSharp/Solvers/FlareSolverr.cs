@@ -155,8 +155,14 @@ namespace FlareSolverrSharp.Solvers
                 proxy = new FlareSolverrRequestProxy
                 {
                     Url = ProxyUrl,
-                    Username = ProxyUsername,
-                    Password = ProxyPassword
+                };
+                if (!string.IsNullOrWhiteSpace(ProxyUsername)
+                {
+                    proxy.Username = ProxyUsername;
+                };
+                if (!string.IsNullOrWhiteSpace(ProxyPassword))
+                {
+                    proxy.Password = ProxyPassword;
                 };
             }
             return proxy;
