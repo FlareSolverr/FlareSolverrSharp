@@ -156,7 +156,7 @@ namespace FlareSolverrSharp.Solvers
                 {
                     Url = ProxyUrl,
                 };
-                if (!string.IsNullOrWhiteSpace(ProxyUsername)
+                if (!string.IsNullOrWhiteSpace(ProxyUsername))
                 {
                     proxy.Username = ProxyUsername;
                 };
