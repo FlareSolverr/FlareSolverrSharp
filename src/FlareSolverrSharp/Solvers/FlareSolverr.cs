@@ -18,6 +18,8 @@ namespace FlareSolverrSharp.Solvers
 
         public int MaxTimeout = 60000;
         public string ProxyUrl = "";
+        public string ProxyUsername = null;
+        public string ProxyPassword = null;
 
         public FlareSolverr(string flareSolverrApiUrl)
         {
@@ -152,7 +154,15 @@ namespace FlareSolverrSharp.Solvers
             {
                 proxy = new FlareSolverrRequestProxy
                 {
-                    Url = ProxyUrl
+                    Url = ProxyUrl,
+                };
+                if (!string.IsNullOrWhiteSpace(ProxyUsername))
+                {
+                    proxy.Username = ProxyUsername;
+                };
+                if (!string.IsNullOrWhiteSpace(ProxyPassword))
+                {
+                    proxy.Password = ProxyPassword;
                 };
             }
             return proxy;
