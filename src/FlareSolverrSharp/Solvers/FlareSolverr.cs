@@ -18,6 +18,8 @@ namespace FlareSolverrSharp.Solvers
 
         public int MaxTimeout = 60000;
         public string ProxyUrl = "";
+        public string ProxyUsername = null;
+        public string ProxyPassword = null;
 
         public FlareSolverr(string flareSolverrApiUrl)
         {
@@ -152,7 +154,15 @@ namespace FlareSolverrSharp.Solvers
             {
                 proxy = new FlareSolverrRequestProxy
                 {
-                    Url = ProxyUrl
+                    Url = ProxyUrl,
+                };
+                if (!string.IsNullOrWhiteSpace(ProxyUsername)
+                {
+                    proxy.Username = ProxyUsername;
+                };
+                if (!string.IsNullOrWhiteSpace(ProxyPassword))
+                {
+                    proxy.Password = ProxyPassword;
                 };
             }
             return proxy;
@@ -172,7 +182,7 @@ namespace FlareSolverrSharp.Solvers
         {
             FlareSolverrRequest req;
             if (string.IsNullOrWhiteSpace(sessionId))
-                sessionId = null; 
+                sessionId = null;
 
             var url = request.RequestUri.ToString();
 
@@ -223,6 +233,6 @@ namespace FlareSolverrSharp.Solvers
 
             return GetSolverRequestContent(req);
         }
- 
+
     }
 }
