@@ -5,7 +5,7 @@
     <TargetFramework>net7.0</TargetFramework>
     <RootNamespace>FlareSolverrSharp.Sample</RootNamespace>
     <AssemblyName>FlareSolverrSharp.Sample</AssemblyName>
-    <Version>3.0.6</Version>
+    <Version>3.0.7</Version>
   </PropertyGroup>
 
   <ItemGroup>
