@@ -141,66 +141,65 @@ namespace FlareSolverrSharp
 
         private void InjectCookies(HttpRequestMessage request, FlareSolverrResponse flareSolverrResponse)
         {
-            var flareCookies = flareSolverrResponse.Solution.Cookies.ToList();
-
             // use only Cloudflare and DDoS-GUARD cookies
-            flareCookies = flareCookies.Where(cookie =>
-                cookie.Name.StartsWith("cf_")
-                || cookie.Name.StartsWith("__cf")
-                || cookie.Name.StartsWith("__ddg")).ToList();
+            var flareCookies = flareSolverrResponse.Solution.Cookies
+                                                   .Where(cookie => IsCloudflareCookie(cookie.Name))
+                                                   .ToList();
 
-            if (!flareCookies.Any())
-                return;
-
-            if (HttpClientHandler.UseCookies)
-            {
-                var currentCookies = HttpClientHandler.CookieContainer.GetCookies(request.RequestUri);
-
-                // remove previous FlareSolverr cookies
-                var expiredCount = 0;
-                foreach (var flareCookie in flareCookies)
-                {
-                    var cookie = currentCookies[flareCookie.Name];
-                    if (cookie == null)
-                        continue;
-                    cookie.Expired = true;
-                    expiredCount += 1;
-                }
-
-                // there is a max number of cookies, we have to make space (we assume the first
-                var cookieExcess = currentCookies.Count + flareCookies.Count
-                                   - expiredCount - HttpClientHandler.CookieContainer.PerDomainCapacity;
-                foreach (Cookie cookie in currentCookies)
-                {
-                    if (cookieExcess == 0)
-                        break;
-                    if (cookie.Expired)
-                        continue;
-                    cookie.Expired = true;
-                    cookieExcess -= 1;
-                }
-
-                // add FlareSolverr cookies
-                foreach (var rCookie in flareCookies)
-                    HttpClientHandler.CookieContainer.Add(request.RequestUri, rCookie.ToCookieObj());
-            }
-            else
+            // not using cookies, just add flaresolverr cookies to the header request
+            if (!HttpClientHandler.UseCookies)
             {
                 foreach (var rCookie in flareCookies)
                     request.Headers.Add(HttpHeaders.Cookie, rCookie.ToHeaderValue());
+
+                return;
+            }
+
+            var currentCookies = HttpClientHandler.CookieContainer.GetCookies(request.RequestUri);
+
+            // remove previous FlareSolverr cookies
+            foreach (var cookie in flareCookies.Select(flareCookie => currentCookies[flareCookie.Name]).Where(cookie => cookie != null))           
+                cookie.Expired = true;
+
+            // add FlareSolverr cookies to CookieContainer
+            foreach (var rCookie in flareCookies)
+                HttpClientHandler.CookieContainer.Add(request.RequestUri, rCookie.ToCookieObj());
+
+            // check if there is too many cookies, we may need to remove some
+            if (HttpClientHandler.CookieContainer.PerDomainCapacity >= currentCookies.Count)           
+                return;
+
+            // check if indeed we have too many cookies
+            var validCookiesCount = currentCookies.Cast<Cookie>().Count(cookie => !cookie.Expired);
+            if (HttpClientHandler.CookieContainer.PerDomainCapacity >= validCookiesCount)          
+                return;           
+
+            // if there is a too many cookies, we have to make space
+            // maybe is better to raise an exception?
+            var cookieExcess = HttpClientHandler.CookieContainer.PerDomainCapacity - validCookiesCount;
+
+            foreach (Cookie cookie in currentCookies)
+            {
+                if (cookieExcess == 0)              
+                    break;               
+
+                if (cookie.Expired || IsCloudflareCookie(cookie.Name))              
+                    continue;               
+
+                cookie.Expired = true;
+                cookieExcess -= 1;
             }
         }
 
-        private void InjectSetCookieHeader(HttpResponseMessage response, FlareSolverrResponse flareSolverrResponse)
+        private static void InjectSetCookieHeader(HttpResponseMessage response, FlareSolverrResponse flareSolverrResponse)
         {
-            var rCookies = flareSolverrResponse.Solution.Cookies;
-            if (!rCookies.Any())
-                return;
-
             // inject set-cookie headers in the response
-            foreach (var rCookie in rCookies)
+            foreach (var rCookie in flareSolverrResponse.Solution.Cookies.Where(cookie => IsCloudflareCookie(cookie.Name)))
                 response.Headers.Add(HttpHeaders.SetCookie, rCookie.ToHeaderValue());
         }
+
+        private static bool IsCloudflareCookie(string cookieName) =>
+            cookieName.StartsWith("cf_") || cookieName.StartsWith("__cf") || cookieName.StartsWith("__ddg");
 
         protected override void Dispose(bool disposing)
         {
