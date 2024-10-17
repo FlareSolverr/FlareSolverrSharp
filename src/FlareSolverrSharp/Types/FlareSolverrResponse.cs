@@ -1,6 +1,7 @@
 ﻿using Flurl.Http;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Net;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -51,23 +52,27 @@ public class FlareSolverrResponse
 	public long EndTimestamp { get; set; }
 
 	[JsonPropertyName("version")]
-	public string Version { get; set; }
+	public Version Version { get; set; }
 
 	[JsonPropertyName("session")]
-	public string Session {get;set;}
+	public string Session { get; set; }
+
 	[JsonPropertyName("sessions")]
-	public string[] Sessions {get;set;}
+	public string[] Sessions { get; set; }
+
 }
 
 public class FlareSolverrSolution
 {
 
-	public string               Url;
-	public string               Status;
-	public FlareSolverrHeaders  Headers;
-	public string               Response;
+	public string              Url;
+	public string              Status;
+	public FlareSolverrHeaders Headers;
+	public string              Response;
+
 	public FlareSolverrCookie[] Cookies;
-	public string               UserAgent;
+
+	public string UserAgent;
 
 }
 
@@ -89,7 +94,14 @@ public class FlareSolverrCookie
 		=> $"{Name}={Value}";
 
 	public Cookie ToCookie()
-		=> new(Name, Value, Path, Domain);
+		=> new(Name, Value /*, Path, Domain*/);
+
+	/*[JsonConstructor]
+	public FlareSolverrCookie(string name, string value)
+	{
+		Name  = name;
+		Value = value;
+	}*/
 
 }
 

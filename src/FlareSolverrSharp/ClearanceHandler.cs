@@ -1,4 +1,6 @@
-﻿global using MNNW = System.Diagnostics.CodeAnalysis.MemberNotNullWhenAttribute;
+﻿global using MN = System.Diagnostics.CodeAnalysis.MaybeNullAttribute;
+global using MNW = System.Diagnostics.CodeAnalysis.MaybeNullWhenAttribute;
+global using MNNW = System.Diagnostics.CodeAnalysis.MemberNotNullWhenAttribute;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
@@ -13,6 +15,8 @@ using FlareSolverrSharp.Solvers;
 using FlareSolverrSharp.Types;
 using Cookie = System.Net.Cookie;
 
+// ReSharper disable InvalidXmlDocComment
+
 namespace FlareSolverrSharp;
 
 /// <summary>
@@ -24,7 +28,7 @@ public class ClearanceHandler : DelegatingHandler
 	private readonly HttpClient _client;
 	private readonly string     _flareSolverrApiUrl;
 
-	public FlareSolverr Solverr { get; set; }
+	public FlareSolverr Solverr { get;  }
 
 	private string _userAgent;
 
@@ -36,18 +40,15 @@ public class ClearanceHandler : DelegatingHandler
 	/// </summary>
 	/// <param name="flareSolverrApiUrl">FlareSolverr API URL. If null or empty it will detect the challenges, but
 	/// they will not be solved. Example: "http://localhost:8191/"</param>
-	public ClearanceHandler(string flareSolverrApiUrl)
+	public ClearanceHandler(string flareSolverrApiUrl, FlareSolverrCommon common = null)
 		: base(new HttpClientHandler())
 	{
 		// Validate URI
-		if (!string.IsNullOrWhiteSpace(flareSolverrApiUrl)
-		    && !Uri.IsWellFormedUriString(flareSolverrApiUrl, UriKind.Absolute))
+		if (string.IsNullOrWhiteSpace(flareSolverrApiUrl)
+		    || !Uri.IsWellFormedUriString(flareSolverrApiUrl, UriKind.Absolute))
 			throw new FlareSolverrException($"FlareSolverr URL is malformed: {flareSolverrApiUrl}");
 
 		_flareSolverrApiUrl = flareSolverrApiUrl;
-
-		Solverr = new FlareSolverr(_flareSolverrApiUrl)
-			{ };
 
 		_client = new HttpClient(new HttpClientHandler
 		{
@@ -55,6 +56,10 @@ public class ClearanceHandler : DelegatingHandler
 			AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate,
 			CookieContainer        = new CookieContainer()
 		});
+
+
+		Solverr = new FlareSolverr(_flareSolverrApiUrl, common ?? new FlareSolverrCommon())
+			{ };
 	}
 
 	[MNNW(true, nameof(Solverr))]
@@ -73,7 +78,8 @@ public class ClearanceHandler : DelegatingHandler
 	{
 		// Init FlareSolverr
 		if (!HasFlareSolverr) {
-			throw new FlareSolverrException($"{nameof(Solverr)} not initialized");
+
+			throw new FlareSolverrException($"{nameof(Solverr)} not initialized"); 
 		}
 
 		// Set the User-Agent if required
@@ -83,7 +89,7 @@ public class ClearanceHandler : DelegatingHandler
 		var response = await base.SendAsync(request, cancellationToken).ConfigureAwait(false);
 
 		// Detect if there is a challenge in the response
-		if (await ChallengeDetector.IsClearanceRequiredAsync(response)) {
+		if (ChallengeDetector.IsClearanceRequiredAsync(response)) {
 
 			// Resolve the challenge using FlareSolverr API
 			var flareSolverrResponse = await Solverr.SolveAsync(request);
@@ -104,7 +110,7 @@ public class ClearanceHandler : DelegatingHandler
 			response = await base.SendAsync(request, cancellationToken).ConfigureAwait(false);
 
 			// Detect if there is a challenge in the response
-			if (EnsureResponseIntegrity && await ChallengeDetector.IsClearanceRequiredAsync(response)) {
+			if (EnsureResponseIntegrity && ChallengeDetector.IsClearanceRequiredAsync(response)) {
 				throw new FlareSolverrException("The cookies provided by FlareSolverr are not valid");
 			}
 
@@ -127,7 +133,12 @@ public class ClearanceHandler : DelegatingHandler
 	private void InjectCookies(HttpRequestMessage request, FlareSolverrResponse flareSolverrResponse)
 	{
 		// use only Cloudflare and DDoS-GUARD cookies
-		var flareCookies = flareSolverrResponse.Solution.Cookies
+		var cookies = flareSolverrResponse.Solution.Cookies;
+
+		if (cookies == null) {
+			cookies = Array.Empty<FlareSolverrCookie>(); //todo
+		}
+		var flareCookies = cookies
 			.Where(cookie => IsCloudflareCookie(cookie.Name))
 			.ToList();
 

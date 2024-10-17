@@ -10,7 +10,10 @@ internal static class Settings
 	internal static readonly Uri ProtectedPostUri = new Uri("https://badasstorrents.com/torrents/search/720p/date/desc");
 	internal static readonly Uri ProtectedDdgUri = new Uri("https://anidex.info/?q=text");
 	internal static readonly Uri ProtectedCcfUri = new Uri("https://www.muziekfabriek.org");
-	internal static readonly Uri ProtectedBlockedUri = new Uri("https://cpasbiens3.fr/");
+
+
+	// causes a redirect making the test falsely fail
+	// internal static readonly Uri ProtectedBlockedUri = new Uri("https://cpasbiens3.fr/");
 
 	/*
 	To configure TinyProxy in local:

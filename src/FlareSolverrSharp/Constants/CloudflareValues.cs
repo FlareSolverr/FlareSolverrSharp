@@ -16,7 +16,8 @@ public static class CloudflareValues
 		"__ddg"
 	];
 
-	public const string CLOUDFLARE_ERROR_CODE = "error code: 1020";
+	public const string CLOUDFLARE_ERROR_CODE_1020 = "error code: 1020";
+	public const string CLOUDFLARE_ERROR_CODE_PREFIX = "error code: ";
 
 	public const string DDOS_GUARD_TITLE = "<title>DDOS-GUARD</title>";
 

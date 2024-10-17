@@ -25,7 +25,7 @@ public class FlareSolverr
 		IncludeFields        = true,
 	};
 
-	private const int MAX_TIMEOUT_DEFAULT = 60000;
+	internal const int MAX_TIMEOUT_DEFAULT = 60000;
 
 	private static readonly SemaphoreLocker s_locker = new SemaphoreLocker();
 
@@ -33,32 +33,23 @@ public class FlareSolverr
 
 	public Uri FlareSolverrUri { get; }
 
-	public int MaxTimeout { get; set; }
+	public FlareSolverrCommon FlareSolverrCommon { get; }
 
-	public string ProxyUrl { get; set; }
-
-	public string ProxyUsername { get; set; }
-
-	public string ProxyPassword { get; set; }
-
-	public FlareSolverr(string flareSolverrApiUrl, int maxTimeout = MAX_TIMEOUT_DEFAULT, string proxyUrl = null,
-	                    string proxyUsername = null, string proxyPassword = null)
+	public FlareSolverr(string flareSolverrApiUrl, FlareSolverrCommon common = null)
 	{
 		var apiUrl = flareSolverrApiUrl;
 
 		if (!apiUrl.EndsWith("/"))
 			apiUrl += "/";
 
-		FlareSolverrUri = new Uri($"{apiUrl}v1");
-		MaxTimeout      = maxTimeout;
-		ProxyPassword   = proxyPassword;
-		ProxyUrl        = proxyUrl;
-		ProxyUsername   = proxyUsername;
+		FlareSolverrUri    = new Uri($"{apiUrl}v1");
+		FlareSolverrCommon = (common ?? new FlareSolverrCommon());
 	}
 
 	public Task<FlareSolverrResponse> SolveAsync(HttpRequestMessage request, string sessionId = null)
 	{
-		return SendFlareSolverrRequestAsync(GenerateFlareSolverrRequest(request, sessionId));
+		var content = GenerateFlareSolverrRequest(request, sessionId);
+		return SendFlareSolverrRequestAsync(content);
 	}
 
 	public Task<FlareSolverrResponse> CreateSessionAsync()
@@ -66,7 +57,7 @@ public class FlareSolverr
 		var req = new FlareSolverrRequestGet
 		{
 			Command    = CloudflareValues.CMD_SESSIONS_CREATE,
-			MaxTimeout = MaxTimeout,
+			MaxTimeout = FlareSolverrCommon.MaxTimeout,
 			Proxy      = GetProxy()
 		};
 		return SendFlareSolverrRequestAsync(GetSolverRequestContent(req));
@@ -77,7 +68,7 @@ public class FlareSolverr
 		var req = new FlareSolverrRequestGet
 		{
 			Command    = CloudflareValues.CMD_SESSIONS_LIST,
-			MaxTimeout = MaxTimeout,
+			MaxTimeout = FlareSolverrCommon.MaxTimeout,
 			Proxy      = GetProxy()
 		};
 		return SendFlareSolverrRequestAsync(GetSolverRequestContent(req));
@@ -88,7 +79,7 @@ public class FlareSolverr
 		var req = new FlareSolverrRequestGet
 		{
 			Command    = CloudflareValues.CMD_SESSIONS_DESTROY,
-			MaxTimeout = MaxTimeout,
+			MaxTimeout = FlareSolverrCommon.MaxTimeout,
 			Proxy      = GetProxy(),
 			Session    = sessionId
 		};
@@ -107,7 +98,7 @@ public class FlareSolverr
 				m_httpClient = new HttpClient();
 
 				// wait 5 more seconds to make sure we return the FlareSolverr timeout message
-				m_httpClient.Timeout = TimeSpan.FromMilliseconds(MaxTimeout + 5000);
+				m_httpClient.Timeout = TimeSpan.FromMilliseconds(FlareSolverrCommon.MaxTimeout + 5000);
 				response             = await m_httpClient.PostAsync(FlareSolverrUri, flareSolverrRequest);
 			}
 			catch (HttpRequestException e) {
@@ -126,9 +117,21 @@ public class FlareSolverr
 			}
 
 			var resContent = await response.Content.ReadAsStringAsync();
+			// var resContent = await response.Content.ReadAsStreamAsync();
 
 			try {
-				result = JsonSerializer.Deserialize<FlareSolverrResponse>(resContent, new JsonSerializerOptions() { IncludeFields = true});
+				var options = new JsonSerializerOptions()
+				{
+					// PropertyNameCaseInsensitive = true,
+					// PropertyNamingPolicy        = JsonNamingPolicy.CamelCase,
+					IncludeFields               = true,
+					// NumberHandling              = JsonNumberHandling.Strict | JsonNumberHandling.AllowReadingFromString,
+
+					// DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingDefault
+				};
+				// result  = await JsonSerializer.DeserializeAsync<FlareSolverrResponse>(resContent, options);
+
+				result = JsonSerializer.Deserialize<FlareSolverrResponse>(resContent, options);
 			}
 			catch (Exception) {
 				throw new FlareSolverrException($"Error parsing response, check FlareSolverr. Response: {resContent}");
@@ -169,18 +172,18 @@ public class FlareSolverr
 	{
 		FlareSolverrRequestProxy proxy = null;
 
-		if (!string.IsNullOrWhiteSpace(ProxyUrl)) {
+		if (!string.IsNullOrWhiteSpace(FlareSolverrCommon.ProxyUrl)) {
 			proxy = new FlareSolverrRequestProxy
 			{
-				Url = ProxyUrl,
+				Url = FlareSolverrCommon.ProxyUrl,
 			};
 
-			if (!string.IsNullOrWhiteSpace(ProxyUsername)) {
-				proxy.Username = ProxyUsername;
+			if (!string.IsNullOrWhiteSpace(FlareSolverrCommon.ProxyUsername)) {
+				proxy.Username = FlareSolverrCommon.ProxyUsername;
 			}
 
-			if (!string.IsNullOrWhiteSpace(ProxyPassword)) {
-				proxy.Password = ProxyPassword;
+			if (!string.IsNullOrWhiteSpace(FlareSolverrCommon.ProxyPassword)) {
+				proxy.Password = FlareSolverrCommon.ProxyPassword;
 			}
 
 		}
@@ -213,7 +216,7 @@ public class FlareSolverr
 			{
 				Command    = CloudflareValues.CMD_REQUEST_GET,
 				Url        = url,
-				MaxTimeout = MaxTimeout,
+				MaxTimeout = FlareSolverrCommon.MaxTimeout,
 				Proxy      = proxy,
 				Session    = sessionId
 			};
@@ -228,7 +231,7 @@ public class FlareSolverr
 					Command    = CloudflareValues.CMD_REQUEST_POST,
 					Url        = url,
 					PostData   = request.Content.ReadAsStringAsync().Result,
-					MaxTimeout = MaxTimeout,
+					MaxTimeout = FlareSolverrCommon.MaxTimeout,
 					Proxy      = proxy,
 					Session    = sessionId
 				};
