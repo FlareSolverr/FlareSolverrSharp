@@ -1,12 +1,11 @@
 ﻿
-namespace FlareSolverrSharp.Sample
+namespace FlareSolverrSharp.Sample;
+
+static class Program
 {
-    static class Program
-    {
-        static void Main()
-        {
-            ClearanceHandlerSample.SampleGet().Wait();
-            ClearanceHandlerSample.SamplePostUrlEncoded().Wait();
-        }
-    }
+	static void Main()
+	{
+		ClearanceHandlerSample.SampleGet().Wait();
+		ClearanceHandlerSample.SamplePostUrlEncoded().Wait();
+	}
 }

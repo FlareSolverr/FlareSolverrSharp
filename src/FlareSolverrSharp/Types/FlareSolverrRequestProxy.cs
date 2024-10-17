@@ -1,16 +1,15 @@
-﻿using Newtonsoft.Json;
+﻿using System.Text.Json.Serialization;
 
-namespace FlareSolverrSharp.Types
+namespace FlareSolverrSharp.Types;
+
+public class FlareSolverrRequestProxy
 {
-    public class FlareSolverrRequestProxy
-    {
-        [JsonProperty("url")]
-        public string Url;
+	[JsonPropertyName("url")]
+	public string Url;
 
-        [JsonProperty("username")]
-        public string Username;
+	[JsonPropertyName("username")]
+	public string Username;
 
-        [JsonProperty("password")]
-        public string Password;
-    }
+	[JsonPropertyName("password")]
+	public string Password;
 }

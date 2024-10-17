@@ -1,14 +1,14 @@
 ﻿using System.Net.Http;
+// ReSharper disable TailRecursiveCall
 
-namespace FlareSolverrSharp.Extensions
+namespace FlareSolverrSharp.Extensions;
+
+internal static class HttpMessageHandlerExtensions
 {
-    internal static class HttpMessageHandlerExtensions
-    {
-        public static HttpMessageHandler GetMostInnerHandler(this HttpMessageHandler self)
-        {
-            return self is DelegatingHandler handler
-                ? handler.InnerHandler.GetMostInnerHandler()
-                : self;
-        }
-    }
+	public static HttpMessageHandler GetInnermostHandler(this HttpMessageHandler self)
+	{
+		return self is DelegatingHandler handler
+			       ? handler.InnerHandler.GetInnermostHandler()
+			       : self;
+	}
 }
