@@ -58,7 +58,9 @@ public class ClearanceHandler : DelegatingHandler
 	}
 
 	[MNNW(true, nameof(Solverr))]
-	public bool HasFlareSolverr => Solverr == null && !string.IsNullOrWhiteSpace(_flareSolverrApiUrl);
+	public bool HasFlareSolverr => Solverr != null && !string.IsNullOrWhiteSpace(_flareSolverrApiUrl);
+
+	public bool EnsureResponseIntegrity { get; set; }
 
 	/// <summary>
 	/// Sends an HTTP request to the inner handler to send to the server as an asynchronous operation.
@@ -102,8 +104,9 @@ public class ClearanceHandler : DelegatingHandler
 			response = await base.SendAsync(request, cancellationToken).ConfigureAwait(false);
 
 			// Detect if there is a challenge in the response
-			/*if (await ChallengeDetector.IsClearanceRequiredAsync(response))
-				throw new FlareSolverrException("The cookies provided by FlareSolverr are not valid");*/
+			if (EnsureResponseIntegrity && await ChallengeDetector.IsClearanceRequiredAsync(response)) {
+				throw new FlareSolverrException("The cookies provided by FlareSolverr are not valid");
+			}
 
 			// Add the "Set-Cookie" header in the response with the cookies provided by FlareSolverr
 			InjectSetCookieHeader(response, flareSolverrResponse);

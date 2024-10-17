@@ -39,7 +39,7 @@ public class ClearanceHandlerTests
 	public async Task SolveOkCloudflareGet()
 	{
 		var handler = new ClearanceHandler(Settings.FlareSolverrApiUrl)
-		{
+		{EnsureResponseIntegrity = true,
 			Solverr =
 			{
 				MaxTimeout = 60000
@@ -157,6 +157,7 @@ public class ClearanceHandlerTests
 			{
 				MaxTimeout = 60000,
 				ProxyUrl   = Settings.ProxyUrl
+				
 
 			}
 		};
@@ -189,6 +190,7 @@ public class ClearanceHandlerTests
 		// Custom CloudFlare for EbookParadijs, Film-Paleis, MuziekFabriek and Puur-Hollands
 		var handler = new ClearanceHandler(Settings.FlareSolverrApiUrl)
 		{
+			EnsureResponseIntegrity = true,
 			Solverr =
 			{
 				MaxTimeout = 60000
@@ -206,6 +208,7 @@ public class ClearanceHandlerTests
 	{
 		var handler = new ClearanceHandler(Settings.FlareSolverrApiUrl)
 		{
+			EnsureResponseIntegrity = true,
 			Solverr =
 			{
 				MaxTimeout = 60000
@@ -234,6 +237,7 @@ public class ClearanceHandlerTests
 
 		var handler = new ClearanceHandler(Settings.FlareSolverrApiUrl)
 		{
+			EnsureResponseIntegrity = true,
 			Solverr =
 			{
 				MaxTimeout = 60000
@@ -259,6 +263,7 @@ public class ClearanceHandlerTests
 	{
 		var handler = new ClearanceHandler("http://localhost:44445")
 		{
+			EnsureResponseIntegrity = true,
 			Solverr =
 			{
 				MaxTimeout = 60000
@@ -285,6 +290,7 @@ public class ClearanceHandlerTests
 		try {
 			new ClearanceHandler("http:/127.0.0.1:9999")
 			{
+			EnsureResponseIntegrity = true,
 				Solverr =
 				{
 					MaxTimeout = 60000
@@ -303,6 +309,7 @@ public class ClearanceHandlerTests
 	{
 		var handler = new ClearanceHandler("")
 		{
+			EnsureResponseIntegrity = true,
 			Solverr =
 			{
 				MaxTimeout = 60000
@@ -328,10 +335,12 @@ public class ClearanceHandlerTests
 	{
 		var handler = new ClearanceHandler(Settings.FlareSolverrApiUrl)
 		{
+			EnsureResponseIntegrity = true,
 			Solverr =
 			{
 				MaxTimeout = 60000,
 				ProxyUrl   = "http://localhost:44445"
+				
 
 			}
 		};

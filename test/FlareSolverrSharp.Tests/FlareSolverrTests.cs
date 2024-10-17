@@ -147,6 +147,7 @@ public class FlareSolverrTests
 		var flareSolverr = new FlareSolverr(Settings.FlareSolverrApiUrl)
 		{
 			ProxyUrl = "http://localhost:44445"
+			
 		};
 		var request = new HttpRequestMessage(HttpMethod.Get, uri);
 

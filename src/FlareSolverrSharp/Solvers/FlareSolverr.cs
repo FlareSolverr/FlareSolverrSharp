@@ -4,6 +4,7 @@ using System.Net.Http;
 using System.Net.Http.Json;
 using System.Text;
 using System.Text.Json;
+using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using FlareSolverrSharp.Constants;
@@ -20,7 +21,7 @@ public class FlareSolverr
 	{
 		DefaultIgnoreCondition =
 			JsonIgnoreCondition.WhenWritingDefault,
-		PropertyNamingPolicy = JsonNamingPolicy.KebabCaseLower,
+		PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
 		IncludeFields        = true,
 	};
 
@@ -127,7 +128,7 @@ public class FlareSolverr
 			var resContent = await response.Content.ReadAsStringAsync();
 
 			try {
-				result = JsonSerializer.Deserialize<FlareSolverrResponse>(resContent);
+				result = JsonSerializer.Deserialize<FlareSolverrResponse>(resContent, new JsonSerializerOptions() { IncludeFields = true});
 			}
 			catch (Exception) {
 				throw new FlareSolverrException($"Error parsing response, check FlareSolverr. Response: {resContent}");
