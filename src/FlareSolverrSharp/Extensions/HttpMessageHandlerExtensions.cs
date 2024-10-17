@@ -1,5 +1,6 @@
 ﻿using System.Net.Http;
 // ReSharper disable TailRecursiveCall
+// ReSharper disable InconsistentNaming
 
 namespace FlareSolverrSharp.Extensions;
 

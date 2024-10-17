@@ -2,6 +2,7 @@
 global using MNW = System.Diagnostics.CodeAnalysis.MaybeNullWhenAttribute;
 global using MNNW = System.Diagnostics.CodeAnalysis.MemberNotNullWhenAttribute;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Net;
@@ -26,30 +27,31 @@ public class ClearanceHandler : DelegatingHandler
 {
 
 	private readonly HttpClient _client;
-	private readonly string     _flareSolverrApiUrl;
-
-	public FlareSolverr Solverr { get;  }
 
 	private string _userAgent;
 
+	public FlareSolverr Solverr { get; }
+
+
+	[MNNW(true, nameof(Solverr))]
+	public bool HasFlareSolverr => Solverr != null;
 
 	private HttpClientHandler HttpClientHandler => InnerHandler.GetInnermostHandler() as HttpClientHandler;
+
+	public bool EnsureResponseIntegrity { get; set; }
 
 	/// <summary>
 	/// Creates a new instance of the <see cref="ClearanceHandler"/>.
 	/// </summary>
 	/// <param name="flareSolverrApiUrl">FlareSolverr API URL. If null or empty it will detect the challenges, but
 	/// they will not be solved. Example: "http://localhost:8191/"</param>
-	public ClearanceHandler(string flareSolverrApiUrl, FlareSolverrCommon common = null)
+	public ClearanceHandler(string api) 
+		: this(new FlareSolverr(api)) { }
+
+	
+	public ClearanceHandler(FlareSolverr solverr)
 		: base(new HttpClientHandler())
 	{
-		// Validate URI
-		if (string.IsNullOrWhiteSpace(flareSolverrApiUrl)
-		    || !Uri.IsWellFormedUriString(flareSolverrApiUrl, UriKind.Absolute))
-			throw new FlareSolverrException($"FlareSolverr URL is malformed: {flareSolverrApiUrl}");
-
-		_flareSolverrApiUrl = flareSolverrApiUrl;
-
 		_client = new HttpClient(new HttpClientHandler
 		{
 			AllowAutoRedirect      = false,
@@ -58,14 +60,8 @@ public class ClearanceHandler : DelegatingHandler
 		});
 
 
-		Solverr = new FlareSolverr(_flareSolverrApiUrl, common ?? new FlareSolverrCommon())
-			{ };
+		Solverr = solverr;
 	}
-
-	[MNNW(true, nameof(Solverr))]
-	public bool HasFlareSolverr => Solverr != null && !string.IsNullOrWhiteSpace(_flareSolverrApiUrl);
-
-	public bool EnsureResponseIntegrity { get; set; }
 
 	/// <summary>
 	/// Sends an HTTP request to the inner handler to send to the server as an asynchronous operation.
@@ -78,8 +74,7 @@ public class ClearanceHandler : DelegatingHandler
 	{
 		// Init FlareSolverr
 		if (!HasFlareSolverr) {
-
-			throw new FlareSolverrException($"{nameof(Solverr)} not initialized"); 
+			throw new FlareSolverrException($"{nameof(Solverr)} not initialized");
 		}
 
 		// Set the User-Agent if required
@@ -97,8 +92,8 @@ public class ClearanceHandler : DelegatingHandler
 			// Save the FlareSolverr User-Agent for the following requests
 			var flareSolverUserAgent = flareSolverrResponse.Solution.UserAgent;
 
-			if (flareSolverUserAgent != null
-			    && !flareSolverUserAgent.Equals(request.Headers.UserAgent.ToString())) {
+			if (flareSolverUserAgent    != null
+			    && flareSolverUserAgent != (request.Headers.UserAgent.ToString())) {
 				_userAgent = flareSolverUserAgent;
 
 				// Set the User-Agent if required
@@ -125,27 +120,27 @@ public class ClearanceHandler : DelegatingHandler
 	{
 		if (_userAgent != null) {
 			// Overwrite the header
-			request.Headers.Remove(CloudflareValues.UserAgent);
-			request.Headers.Add(CloudflareValues.UserAgent, _userAgent);
+			request.Headers.Remove(FlareSolverrValues.UserAgent);
+			request.Headers.Add(FlareSolverrValues.UserAgent, _userAgent);
 		}
 	}
+
+	public bool CookieCapacity { get; set; }
 
 	private void InjectCookies(HttpRequestMessage request, FlareSolverrResponse flareSolverrResponse)
 	{
 		// use only Cloudflare and DDoS-GUARD cookies
-		var cookies = flareSolverrResponse.Solution.Cookies;
+		var cookies = flareSolverrResponse.Solution.Cookies ?? []; //todo
 
-		if (cookies == null) {
-			cookies = Array.Empty<FlareSolverrCookie>(); //todo
-		}
 		var flareCookies = cookies
-			.Where(cookie => IsCloudflareCookie(cookie.Name))
+			.Where(static cookie => IsCloudflareCookie(cookie.Name))
 			.ToList();
 
 		// not using cookies, just add flaresolverr cookies to the header request
 		if (!HttpClientHandler.UseCookies) {
-			foreach (var rCookie in flareCookies)
-				request.Headers.Add(CloudflareValues.Cookie, rCookie.ToHeaderValue());
+			foreach (var rCookie in flareCookies) {
+				request.Headers.Add(FlareSolverrValues.Cookie, rCookie.ToHeaderValue());
+			}
 
 			return;
 		}
@@ -153,37 +148,45 @@ public class ClearanceHandler : DelegatingHandler
 		var currentCookies = HttpClientHandler.CookieContainer.GetCookies(request.RequestUri);
 
 		// remove previous FlareSolverr cookies
-		foreach (var cookie in flareCookies.Select(flareCookie => currentCookies[flareCookie.Name])
-			         .Where(cookie => cookie != null))
+		var oldCookies = flareCookies.Select(flareCookie => currentCookies[flareCookie.Name])
+			.Where(static cookie => cookie != null);
+
+		foreach (var cookie in oldCookies) {
 			cookie.Expired = true;
+		}
 
 		// add FlareSolverr cookies to CookieContainer
-		foreach (var rCookie in flareCookies)
+		foreach (var rCookie in flareCookies) {
 			HttpClientHandler.CookieContainer.Add(request.RequestUri, rCookie.ToCookie());
+		}
 
-		// check if there is too many cookies, we may need to remove some
-		if (HttpClientHandler.CookieContainer.PerDomainCapacity >= currentCookies.Count)
-			return;
 
-		// check if indeed we have too many cookies
-		var validCookiesCount = currentCookies.Cast<Cookie>().Count(cookie => !cookie.Expired);
+		if (CookieCapacity) {
+			// check if there is too many cookies, we may need to remove some
+			if (HttpClientHandler.CookieContainer.PerDomainCapacity >= currentCookies.Count)
+				return;
 
-		if (HttpClientHandler.CookieContainer.PerDomainCapacity >= validCookiesCount)
-			return;
+			// check if indeed we have too many cookies
+			var validCookiesCount = currentCookies.Cast<Cookie>().Count(cookie => !cookie.Expired);
 
-		// if there is a too many cookies, we have to make space
-		// maybe is better to raise an exception?
-		var cookieExcess = HttpClientHandler.CookieContainer.PerDomainCapacity - validCookiesCount;
+			if (HttpClientHandler.CookieContainer.PerDomainCapacity >= validCookiesCount)
+				return;
 
-		foreach (Cookie cookie in currentCookies) {
-			if (cookieExcess == 0)
-				break;
+			// if there is a too many cookies, we have to make space
+			// maybe is better to raise an exception?
+			var cookieExcess = HttpClientHandler.CookieContainer.PerDomainCapacity - validCookiesCount;
 
-			if (cookie.Expired || IsCloudflareCookie(cookie.Name))
-				continue;
+			foreach (Cookie cookie in currentCookies) {
+				if (cookieExcess == 0)
+					break;
 
-			cookie.Expired =  true;
-			cookieExcess   -= 1;
+				if (cookie.Expired || IsCloudflareCookie(cookie.Name))
+					continue;
+
+				cookie.Expired =  true;
+				cookieExcess   -= 1;
+			}
+
 		}
 	}
 
@@ -192,8 +195,9 @@ public class ClearanceHandler : DelegatingHandler
 	{
 		// inject set-cookie headers in the response
 		foreach (var rCookie in flareSolverrResponse.Solution.Cookies.Where(
-			         cookie => IsCloudflareCookie(cookie.Name)))
-			response.Headers.Add(CloudflareValues.SetCookie, rCookie.ToHeaderValue());
+			         cookie => IsCloudflareCookie(cookie.Name))) {
+			response.Headers.Add(FlareSolverrValues.SetCookie, rCookie.ToHeaderValue());
+		}
 	}
 
 	private static bool IsCloudflareCookie(string cookieName)

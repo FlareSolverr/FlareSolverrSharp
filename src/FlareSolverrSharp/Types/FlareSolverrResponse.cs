@@ -65,14 +65,30 @@ public class FlareSolverrResponse
 public class FlareSolverrSolution
 {
 
-	public string              Url;
-	public string              Status;
+	[JsonPropertyName("url")]
+	public string Url;
+
+	[JsonPropertyName("status")]
+	public string Status;
+
+	[JsonPropertyName("headers")]
 	public FlareSolverrHeaders Headers;
-	public string              Response;
 
-	public FlareSolverrCookie[] Cookies;
+	[JsonPropertyName("response")]
+	public string Response;
 
+	[JsonPropertyName("cookies")]
+	[JsonObjectCreationHandling(JsonObjectCreationHandling.Populate)]
+	public IList<FlareSolverrCookie> Cookies;
+
+	[JsonPropertyName("userAgent")]
 	public string UserAgent;
+
+	[JsonConstructor]
+	public FlareSolverrSolution()
+	{
+		Cookies = [];
+	}
 
 }
 

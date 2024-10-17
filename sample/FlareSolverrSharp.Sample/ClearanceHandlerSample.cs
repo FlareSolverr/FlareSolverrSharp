@@ -38,6 +38,7 @@ public static class ClearanceHandlerSample
 			{
 				MaxTimeout = 60000
 
+
 			}
 		};
 

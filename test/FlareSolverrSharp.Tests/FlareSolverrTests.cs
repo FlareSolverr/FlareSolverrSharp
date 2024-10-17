@@ -25,7 +25,7 @@ public class FlareSolverrTests
 		Assert.AreEqual("", flareSolverrResponse.Message);
 		Assert.IsTrue(flareSolverrResponse.StartTimestamp > 0);
 		Assert.IsTrue(flareSolverrResponse.EndTimestamp   > flareSolverrResponse.StartTimestamp);
-		Assert.IsTrue(flareSolverrResponse.Version.Major==2);
+		Assert.IsTrue(flareSolverrResponse.Version.Major  == 2);
 
 		Assert.AreEqual("https://www.google.com/", flareSolverrResponse.Solution.Url);
 		Assert.IsTrue(flareSolverrResponse.Solution.Response.Contains("<title>Google</title>"));
@@ -49,7 +49,7 @@ public class FlareSolverrTests
 		Assert.AreEqual("", flareSolverrResponse.Message);
 		Assert.IsTrue(flareSolverrResponse.StartTimestamp > 0);
 		Assert.IsTrue(flareSolverrResponse.EndTimestamp   > flareSolverrResponse.StartTimestamp);
-		Assert.IsTrue(flareSolverrResponse.Version.Major==2);
+		Assert.IsTrue(flareSolverrResponse.Version.Major  == 2);
 
 
 		var firstCookie = flareSolverrResponse.Solution.Cookies.First();
@@ -65,7 +65,7 @@ public class FlareSolverrTests
 		var uri          = new Uri("https://www.google.com/");
 		var flareSolverr = new FlareSolverr(Settings.FlareSolverrApiUrl);
 		var request      = new HttpRequestMessage(HttpMethod.Get, uri);
-		request.Headers.Add(CloudflareValues.UserAgent, userAgent);
+		request.Headers.Add(FlareSolverrValues.UserAgent, userAgent);
 
 		var flareSolverrResponse = await flareSolverr.SolveAsync(request);
 		Assert.AreEqual("ok", flareSolverrResponse.Status);
@@ -79,7 +79,7 @@ public class FlareSolverrTests
 
 		var flareSolverr = new FlareSolverr(Settings.FlareSolverrApiUrl)
 		{
-			FlareSolverrCommon = { ProxyUrl = Settings.ProxyUrl }
+			Proxy = { Url = Settings.ProxyUrl }
 		};
 		var request = new HttpRequestMessage(HttpMethod.Get, uri);
 
@@ -88,7 +88,7 @@ public class FlareSolverrTests
 		Assert.AreEqual("", flareSolverrResponse.Message);
 		Assert.IsTrue(flareSolverrResponse.StartTimestamp > 0);
 		Assert.IsTrue(flareSolverrResponse.EndTimestamp   > flareSolverrResponse.StartTimestamp);
-		Assert.IsTrue(flareSolverrResponse.Version.Major==2);
+		Assert.IsTrue(flareSolverrResponse.Version.Major  == 2);
 
 		Assert.AreEqual("https://www.google.com/", flareSolverrResponse.Solution.Url);
 		Assert.IsTrue(flareSolverrResponse.Solution.Response.Contains("<title>Google</title>"));
@@ -147,7 +147,7 @@ public class FlareSolverrTests
 
 		var flareSolverr = new FlareSolverr(Settings.FlareSolverrApiUrl)
 		{
-			FlareSolverrCommon = { ProxyUrl = "http://localhost:44445" }
+			Proxy = { Url = "http://localhost:44445" }
 
 		};
 		var request = new HttpRequestMessage(HttpMethod.Get, uri);
@@ -172,7 +172,7 @@ public class FlareSolverrTests
 
 		var flareSolverr = new FlareSolverr(Settings.FlareSolverrApiUrl)
 		{
-			FlareSolverrCommon = { MaxTimeout = 100 }
+			MaxTimeout = 100
 		};
 		var request = new HttpRequestMessage(HttpMethod.Get, uri);
 
@@ -200,7 +200,7 @@ public class FlareSolverrTests
 		Assert.AreEqual("Session created successfully.", flareSolverrResponse.Message);
 		Assert.IsTrue(flareSolverrResponse.StartTimestamp > 0);
 		Assert.IsTrue(flareSolverrResponse.EndTimestamp   > flareSolverrResponse.StartTimestamp);
-		Assert.IsTrue(flareSolverrResponse.Version.Major==2);
+		Assert.IsTrue(flareSolverrResponse.Version.Major  == 2);
 		Assert.IsTrue(flareSolverrResponse.Session.Length > 0);
 
 		// request with session

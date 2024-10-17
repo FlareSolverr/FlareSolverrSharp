@@ -6,19 +6,20 @@ namespace FlareSolverrSharp.Utilities;
 
 public class SemaphoreLocker
 {
+
 	private readonly SemaphoreSlim _semaphore = new(1, 1);
 
 	public async Task LockAsync<T>(Func<T> worker)
 		where T : Task
 	{
 		await _semaphore.WaitAsync();
-		try
-		{
+
+		try {
 			await worker();
 		}
-		finally
-		{
+		finally {
 			_semaphore.Release();
 		}
 	}
+
 }
