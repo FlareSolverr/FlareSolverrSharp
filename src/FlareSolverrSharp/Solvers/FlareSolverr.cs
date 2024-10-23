@@ -40,14 +40,15 @@ public class FlareSolverr : INotifyPropertyChanged
 			JsonIgnoreCondition.WhenWritingDefault,
 	};
 
-	private static readonly SemaphoreLocker s_locker = new SemaphoreLocker();
+	private static readonly SemaphoreLocker s_locker = new();
 
-	private /*readonly*/ HttpClient m_httpClient;
+	private readonly HttpClient m_httpClient;
 
 	public Uri FlareSolverrApi { get; }
 
-	private readonly Uri _flareSolverrIndexUri;
-	private          int m_maxTimeout;
+	public Uri FlareSolverrIndexUri { get; }
+
+	private int m_maxTimeout;
 
 	public int MaxTimeout
 	{
@@ -77,7 +78,7 @@ public class FlareSolverr : INotifyPropertyChanged
 		}
 
 		FlareSolverrApi = new Uri($"{apiUrl}v1");
-
+		FlareSolverrIndexUri = new Uri(apiUrl);
 		m_httpClient = new HttpClient()
 		{
 			// Timeout = AdjustHttpClientTimeout()
@@ -200,7 +201,7 @@ public class FlareSolverr : INotifyPropertyChanged
 				// m_httpClient.Timeout = TimeSpan.FromMilliseconds(MaxTimeout + 5000);
 
 				if (flareSolverrRequest == null) {
-					response = await m_httpClient.GetAsync(_flareSolverrIndexUri);
+					response = await m_httpClient.GetAsync(FlareSolverrIndexUri);
 				}
 				else {
 					response = await m_httpClient.PostAsync(FlareSolverrApi, flareSolverrRequest);

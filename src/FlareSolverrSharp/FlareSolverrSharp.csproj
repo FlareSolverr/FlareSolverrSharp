@@ -5,7 +5,7 @@
     <PackageId>FlareSolverrSharp</PackageId>
     <RootNamespace>FlareSolverrSharp</RootNamespace>
     <LangVersion>latest</LangVersion>
-    <Version>3.0.7</Version>
+    <Version>3.0.8</Version>
     <Authors>Diego Heras (ngosang)</Authors>
     <Description>FlareSolverr .Net / Proxy server to bypass Cloudflare protection.</Description>
     <PackageTags>flaresolverr, flaresolver, cloudflare, solver, bypass, protection, solving, library, cloudflaresolver, delegatinghandler, recaptcha, captcha, javascript, challenge, utilities</PackageTags>

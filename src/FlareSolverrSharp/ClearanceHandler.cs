@@ -44,7 +44,7 @@ public class ClearanceHandler : DelegatingHandler
 
 	public bool CookieCapacity { get; set; }
 
-	private readonly IFlaresolverrResponseStorage _responseStorage;
+	private readonly IFlareSolverrResponseStorage _responseStorage;
 
 	/// <summary>
 	/// Creates a new instance of the <see cref="ClearanceHandler"/>.
@@ -52,10 +52,10 @@ public class ClearanceHandler : DelegatingHandler
 	/// <param name="flareSolverrApiUrl">FlareSolverr API URL. If null or empty it will detect the challenges, but
 	/// they will not be solved. Example: "http://localhost:8191/"</param>
 	public ClearanceHandler(string api)
-		: this(new FlareSolverr(api), new DefaultFlaresolverrResponseStorage()) { }
+		: this(new FlareSolverr(api), new DefaultFlareSolverrResponseStorage()) { }
 
 
-	public ClearanceHandler(FlareSolverr solverr, IFlaresolverrResponseStorage storage)
+	public ClearanceHandler(FlareSolverr solverr, IFlareSolverrResponseStorage storage)
 		: base(new HttpClientHandler())
 	{
 		m_client = new HttpClient(new HttpClientHandler

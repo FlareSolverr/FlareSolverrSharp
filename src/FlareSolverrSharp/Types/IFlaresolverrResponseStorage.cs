@@ -1,11 +1,11 @@
-﻿// Author: Deci | Project: FlareSolverrSharp | Name: IFlaresolverrResponseStorage.cs
+﻿// Author: Deci | Project: FlareSolverrSharp | Name: IFlareSolverrResponseStorage.cs
 // Date: 2024/10/23 @ 17:10:02
 
 using System.Threading.Tasks;
 
 namespace FlareSolverrSharp.Types;
 
-public interface IFlaresolverrResponseStorage
+public interface IFlareSolverrResponseStorage
 {
 
 	Task SaveAsync(FlareSolverrResponse result);
@@ -14,7 +14,7 @@ public interface IFlaresolverrResponseStorage
 
 }
 
-public class DefaultFlaresolverrResponseStorage : IFlaresolverrResponseStorage
+public class DefaultFlareSolverrResponseStorage : IFlareSolverrResponseStorage
 {
 
 	public Task<FlareSolverrResponse?> LoadAsync()

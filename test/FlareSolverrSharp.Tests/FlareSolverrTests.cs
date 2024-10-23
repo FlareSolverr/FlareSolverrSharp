@@ -43,7 +43,7 @@ public class FlareSolverrTests
 	[TestMethod]
 	public async Task SolveOk2()
 	{
-		var uri          = new Uri("https://ascii2d.net/search/url/https://pomf2.lain.la/f/m2otcpa1.jpeg");
+		var uri          = new Uri("https://ascii2d.net/search/url/https://www.reddit.com/media?url=https%3A%2F%2Fi.redd.it%2Fxixxli0axz7b1.jpg");
 		var flareSolverr = new FlareSolverr(Settings.FlareSolverrApiUrl);
 		var request      = new HttpRequestMessage(HttpMethod.Get, uri);
 
@@ -60,7 +60,26 @@ public class FlareSolverrTests
 		Assert.IsTrue(!string.IsNullOrWhiteSpace(firstCookie.Name));
 		Assert.IsTrue(!string.IsNullOrWhiteSpace(firstCookie.Value));
 	}
+	[TestMethod]
+	public async Task SolveOk3()
+	{
+		var uri          = new Uri("https://ascii2d.net/search/url/https://www.reddit.com/media?url=https%3A%2F%2Fi.redd.it%2Fxixxli0axz7b1.jpg");
+		var flareSolverr = new FlareSolverr(Settings.FlareSolverrApiUrl);
+		var request      = new HttpRequestMessage(HttpMethod.Get, uri);
 
+		var flareSolverrResponse = await flareSolverr.SolveAsync(request);
+		Assert.AreEqual("ok", flareSolverrResponse.Status);
+
+		// Assert.AreEqual("", flareSolverrResponse.Message);
+		Assert.IsTrue(flareSolverrResponse.StartTimestamp > 0);
+		Assert.IsTrue(flareSolverrResponse.EndTimestamp   > flareSolverrResponse.StartTimestamp);
+		Assert.IsTrue(flareSolverrResponse.Version.Major  >= 2);
+
+
+		var firstCookie = flareSolverrResponse.Solution.Cookies.First();
+		Assert.IsTrue(!string.IsNullOrWhiteSpace(firstCookie.Name));
+		Assert.IsTrue(!string.IsNullOrWhiteSpace(firstCookie.Value));
+	}
 	[TestMethod]
 	public async Task SolveOkUserAgent()
 	{
