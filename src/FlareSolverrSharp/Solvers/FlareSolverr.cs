@@ -41,7 +41,7 @@ public class FlareSolverr : INotifyPropertyChanged
 
 	private static readonly SemaphoreLocker s_locker = new SemaphoreLocker();
 
-	private readonly HttpClient m_httpClient;
+	private /*readonly*/ HttpClient m_httpClient;
 
 	public Uri FlareSolverrApi { get; }
 
@@ -53,7 +53,7 @@ public class FlareSolverr : INotifyPropertyChanged
 		set
 		{
 			SetField(ref m_maxTimeout, value);
-			m_httpClient.Timeout = AdjustHttpClientTimeout();
+			// m_httpClient.Timeout = AdjustHttpClientTimeout();
 		}
 	}
 
@@ -76,10 +76,10 @@ public class FlareSolverr : INotifyPropertyChanged
 
 		FlareSolverrApi = new Uri($"{apiUrl}v1");
 
-		m_httpClient = new HttpClient()
+		/*m_httpClient = new HttpClient()
 		{
 			// Timeout = AdjustHttpClientTimeout()
-		};
+		};*/
 
 		MaxTimeout = FlareSolverrValues.MAX_TIMEOUT_DEFAULT;
 		Proxy      = new FlareSolverrRequestProxy();
@@ -143,13 +143,13 @@ public class FlareSolverr : INotifyPropertyChanged
 		//todo: what is this "semaphore locker" for
 
 		// await s_locker.LockAsync(() => SendRequestAsync(flareSolverrRequest));
-		HttpResponseMessage  response;
+		HttpResponseMessage response;
 
 		try {
-			// m_httpClient = new HttpClient();
+			m_httpClient = new HttpClient();
 
 			// wait 5 more seconds to make sure we return the FlareSolverr timeout message
-			// m_httpClient.Timeout = TimeSpan.FromMilliseconds(MaxTimeout + 5000);
+			m_httpClient.Timeout = TimeSpan.FromMilliseconds(MaxTimeout + 5000);
 			response = await m_httpClient.PostAsync(FlareSolverrApi, flareSolverrRequest);
 		}
 		catch (HttpRequestException e) {
@@ -159,7 +159,7 @@ public class FlareSolverr : INotifyPropertyChanged
 			throw new FlareSolverrException($"Exception: {e}");
 		}
 		finally {
-			// m_httpClient.Dispose();
+			m_httpClient.Dispose();
 		}
 
 		// Don't try parsing if FlareSolverr hasn't returned 200 or 500
@@ -270,6 +270,34 @@ public class FlareSolverr : INotifyPropertyChanged
 				Session    = sessionId
 			};
 		}
+		/*else if (request.Method == HttpMethod.Post) {
+			// request.Content.GetType() doesn't work well when encoding != utf-8
+			var contentMediaType = request.Content.Headers.ContentType?.MediaType.ToLower() ?? "<null>";
+
+			if (contentMediaType.Contains("application/x-www-form-urlencoded")) {
+				req = new FlareSolverrRequestPost
+				{
+					Command        = FlareSolverrValues.CMD_REQUEST_POST,
+					Url        = url,
+					PostData   = request.Content.ReadAsStringAsync().Result,
+					MaxTimeout = MaxTimeout,
+					Proxy      = Proxy,
+					Session    = sessionId
+				};
+			}
+			else if (contentMediaType.Contains("multipart/form-data")
+			         || contentMediaType.Contains("text/html")) {
+				//TODO Implement - check if we just need to pass the content-type with the relevant headers
+				throw new FlareSolverrException("Unimplemented POST Content-Type: " + contentMediaType);
+			}
+			else {
+				throw new FlareSolverrException("Unsupported POST Content-Type: " + contentMediaType);
+			}
+		}
+		else {
+			throw new FlareSolverrException("Unsupported HttpMethod: " + request.Method);
+		}*/
+
 		else if (request.Method == HttpMethod.Post) {
 			// request.Content.GetType() doesn't work well when encoding != utf-8
 			var contentType = request.Content.Headers.ContentType;

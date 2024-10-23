@@ -69,7 +69,7 @@ public class FlareSolverrSolution
 	public string Url;
 
 	[JsonPropertyName("status")]
-	public string Status;
+	public int Status;
 
 	[JsonPropertyName("headers")]
 	public FlareSolverrHeaders Headers;

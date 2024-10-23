@@ -27,11 +27,12 @@ public static class ChallengeDetector
 	private static bool IsCloudflareProtectedAsync(HttpResponseMessage response)
 	{
 		// check response headers
-		if (!response.Headers.Server.Any(i =>
+		if (response.Headers.Server.Any(i =>
 			                                 i.Product != null
 			                                 && CloudflareValues.CloudflareServerNames.Contains(
-				                                 i.Product.Name.ToLower())))
-			return false;
+				                                 i.Product.Name.ToLower()))) {
+			return true;
+		}
 
 		// detect CloudFlare and DDoS-GUARD
 		if (response.StatusCode is HttpStatusCode.ServiceUnavailable or HttpStatusCode.Forbidden

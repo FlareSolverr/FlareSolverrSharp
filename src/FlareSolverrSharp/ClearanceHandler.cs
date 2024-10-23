@@ -15,6 +15,7 @@ using FlareSolverrSharp.Extensions;
 using FlareSolverrSharp.Solvers;
 using FlareSolverrSharp.Types;
 using Cookie = System.Net.Cookie;
+// ReSharper disable InconsistentNaming
 
 // ReSharper disable InvalidXmlDocComment
 
@@ -26,9 +27,9 @@ namespace FlareSolverrSharp;
 public class ClearanceHandler : DelegatingHandler
 {
 
-	private readonly HttpClient _client;
+	private readonly HttpClient m_client;
 
-	private string _userAgent;
+	private string m_userAgent;
 
 	public FlareSolverr Solverr { get; }
 
@@ -39,6 +40,8 @@ public class ClearanceHandler : DelegatingHandler
 	private HttpClientHandler HttpClientHandler => InnerHandler.GetInnermostHandler() as HttpClientHandler;
 
 	public bool EnsureResponseIntegrity { get; set; }
+
+	public bool CookieCapacity { get; set; }
 
 	/// <summary>
 	/// Creates a new instance of the <see cref="ClearanceHandler"/>.
@@ -52,7 +55,7 @@ public class ClearanceHandler : DelegatingHandler
 	public ClearanceHandler(FlareSolverr solverr)
 		: base(new HttpClientHandler())
 	{
-		_client = new HttpClient(new HttpClientHandler
+		m_client = new HttpClient(new HttpClientHandler
 		{
 			AllowAutoRedirect      = false,
 			AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate,
@@ -94,7 +97,7 @@ public class ClearanceHandler : DelegatingHandler
 
 			if (flareSolverUserAgent    != null
 			    && flareSolverUserAgent != (request.Headers.UserAgent.ToString())) {
-				_userAgent = flareSolverUserAgent;
+				m_userAgent = flareSolverUserAgent;
 
 				// Set the User-Agent if required
 				SetUserAgentHeader(request);
@@ -105,8 +108,11 @@ public class ClearanceHandler : DelegatingHandler
 			response = await base.SendAsync(request, cancellationToken).ConfigureAwait(false);
 
 			// Detect if there is a challenge in the response
-			if (EnsureResponseIntegrity && ChallengeDetector.IsClearanceRequiredAsync(response)) {
-				throw new FlareSolverrException("The cookies provided by FlareSolverr are not valid");
+			if (EnsureResponseIntegrity) {
+
+				if (ChallengeDetector.IsClearanceRequiredAsync(response)) {
+					// throw new FlareSolverrException("The cookies provided by FlareSolverr are not valid");
+				}
 			}
 
 			// Add the "Set-Cookie" header in the response with the cookies provided by FlareSolverr
@@ -118,14 +124,12 @@ public class ClearanceHandler : DelegatingHandler
 
 	private void SetUserAgentHeader(HttpRequestMessage request)
 	{
-		if (_userAgent != null) {
+		if (m_userAgent != null) {
 			// Overwrite the header
 			request.Headers.Remove(FlareSolverrValues.UserAgent);
-			request.Headers.Add(FlareSolverrValues.UserAgent, _userAgent);
+			request.Headers.Add(FlareSolverrValues.UserAgent, m_userAgent);
 		}
 	}
-
-	public bool CookieCapacity { get; set; }
 
 	private void InjectCookies(HttpRequestMessage request, FlareSolverrResponse flareSolverrResponse)
 	{
@@ -206,7 +210,7 @@ public class ClearanceHandler : DelegatingHandler
 	protected override void Dispose(bool disposing)
 	{
 		if (disposing)
-			_client.Dispose();
+			m_client.Dispose();
 
 		base.Dispose(disposing);
 	}

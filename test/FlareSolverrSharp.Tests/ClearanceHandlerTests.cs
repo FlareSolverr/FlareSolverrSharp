@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Web;
 using FlareSolverrSharp.Exceptions;
+using FlareSolverrSharp.Sample;
 using FlareSolverrSharp.Solvers;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
