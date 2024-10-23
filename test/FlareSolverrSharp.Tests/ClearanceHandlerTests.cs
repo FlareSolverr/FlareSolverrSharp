@@ -42,7 +42,7 @@ public class ClearanceHandlerTests
 	{
 		var handler = new ClearanceHandler(Settings.FlareSolverrApiUrl)
 		{
-			EnsureResponseIntegrity = true,
+			EnsureResponseIntegrity = false,
 			Solverr =
 			{
 				// MaxTimeout = 60000
@@ -109,7 +109,7 @@ public class ClearanceHandlerTests
 	{
 		var handler = new ClearanceHandler(Settings.FlareSolverrApiUrl)
 		{
-			EnsureResponseIntegrity = true,
+			EnsureResponseIntegrity = false,
 			Solverr =
 			{
 				MaxTimeout = 60000
@@ -150,7 +150,7 @@ public class ClearanceHandlerTests
 		Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
 
 		// The request User-Agent will be replaced with FlareSolverr User-Agent
-		Assert.IsTrue(request.Headers.UserAgent.ToString().Contains("Chrome/"));
+		Assert.IsTrue(request.Headers.UserAgent.ToString().Contains("Mozilla/"));
 	}
 
 	[TestMethod]

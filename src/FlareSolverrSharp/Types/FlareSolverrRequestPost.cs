@@ -6,8 +6,8 @@ namespace FlareSolverrSharp.Types;
 public class FlareSolverrRequestPost : FlareSolverrRequest
 {
 	[JsonPropertyName("postData")]
-	public string PostData;
+	public string PostData {get;set;}
 
 	[JsonPropertyName("maxTimeout")]
-	public int MaxTimeout;
+	public int MaxTimeout {get;set;}
 }

@@ -66,45 +66,59 @@ public class FlareSolverrSolution
 {
 
 	[JsonPropertyName("url")]
-	public string Url;
+	public string Url { get; set; }
 
 	[JsonPropertyName("status")]
-	public int Status;
+	public int Status { get; set; }
 
 	[JsonPropertyName("headers")]
-	public FlareSolverrHeaders Headers;
+	public FlareSolverrHeaders Headers { get; set; }
 
 	[JsonPropertyName("response")]
-	public string Response;
+	public string Response { get; set; }
 
 	[JsonPropertyName("cookies")]
-	[JsonObjectCreationHandling(JsonObjectCreationHandling.Populate)]
-	public IList<FlareSolverrCookie> Cookies;
+
+	// [JsonObjectCreationHandling(JsonObjectCreationHandling.Populate)]
+	public FlareSolverrCookie[] Cookies { get; set; }
 
 	[JsonPropertyName("userAgent")]
-	public string UserAgent;
+	public string UserAgent { get; set; }
 
-	[JsonConstructor]
+	/*[JsonConstructor]
 	public FlareSolverrSolution()
 	{
 		Cookies = [];
-	}
+	}*/
 
 }
 
 public class FlareSolverrCookie
 {
 
-	public string Name;
-	public string Value;
-	public string Domain;
-	public string Path;
-	public double Expires;
-	public int    Size;
-	public bool   HttpOnly;
-	public bool   Secure;
-	public bool   Session;
-	public string SameSite;
+	[JsonPropertyName("name")]
+	public string Name { get; set; }
+
+	[JsonPropertyName("value")]
+	public string Value { get; set; }
+
+	[JsonPropertyName("domain")]
+	public string Domain { get; set; }
+
+	[JsonPropertyName("path")]
+	public string Path { get; set; }
+
+	[JsonPropertyName("expires")]
+	public int Expiry { get; set; }
+
+	[JsonPropertyName("httpOnly")]
+	public bool HttpOnly { get; set; }
+
+	[JsonPropertyName("secure")]
+	public bool Secure { get; set; }
+
+	[JsonPropertyName("sameSite")]
+	public string SameSite { get; set; }
 
 	public string ToHeaderValue()
 		=> $"{Name}={Value}";
@@ -124,11 +138,14 @@ public class FlareSolverrCookie
 public class FlareSolverrHeaders
 {
 
-	public string Status;
-	public string Date;
+	[JsonPropertyName("status")]
+	public string Status { get; set; }
+
+	[JsonPropertyName("date")]
+	public string Date { get; set; }
 
 	[JsonPropertyName("content-type")]
-	public string ContentType;
+	public string ContentType { get; set; }
 
 }
 

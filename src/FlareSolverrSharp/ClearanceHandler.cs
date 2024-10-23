@@ -15,6 +15,7 @@ using FlareSolverrSharp.Extensions;
 using FlareSolverrSharp.Solvers;
 using FlareSolverrSharp.Types;
 using Cookie = System.Net.Cookie;
+
 // ReSharper disable InconsistentNaming
 
 // ReSharper disable InvalidXmlDocComment
@@ -43,16 +44,18 @@ public class ClearanceHandler : DelegatingHandler
 
 	public bool CookieCapacity { get; set; }
 
+	private readonly IFlaresolverrResponseStorage _responseStorage;
+
 	/// <summary>
 	/// Creates a new instance of the <see cref="ClearanceHandler"/>.
 	/// </summary>
 	/// <param name="flareSolverrApiUrl">FlareSolverr API URL. If null or empty it will detect the challenges, but
 	/// they will not be solved. Example: "http://localhost:8191/"</param>
-	public ClearanceHandler(string api) 
-		: this(new FlareSolverr(api)) { }
+	public ClearanceHandler(string api)
+		: this(new FlareSolverr(api), new DefaultFlaresolverrResponseStorage()) { }
 
-	
-	public ClearanceHandler(FlareSolverr solverr)
+
+	public ClearanceHandler(FlareSolverr solverr, IFlaresolverrResponseStorage storage)
 		: base(new HttpClientHandler())
 	{
 		m_client = new HttpClient(new HttpClientHandler
@@ -63,7 +66,8 @@ public class ClearanceHandler : DelegatingHandler
 		});
 
 
-		Solverr = solverr;
+		Solverr          = solverr;
+		_responseStorage = storage;
 	}
 
 	/// <summary>
@@ -87,6 +91,7 @@ public class ClearanceHandler : DelegatingHandler
 		var response = await base.SendAsync(request, cancellationToken).ConfigureAwait(false);
 
 		// Detect if there is a challenge in the response
+		/*
 		if (ChallengeDetector.IsClearanceRequiredAsync(response)) {
 
 			// Resolve the challenge using FlareSolverr API
@@ -111,13 +116,67 @@ public class ClearanceHandler : DelegatingHandler
 			if (EnsureResponseIntegrity) {
 
 				if (ChallengeDetector.IsClearanceRequiredAsync(response)) {
-					// throw new FlareSolverrException("The cookies provided by FlareSolverr are not valid");
+					throw new FlareSolverrException("The cookies provided by FlareSolverr are not valid");
 				}
 			}
 
 			// Add the "Set-Cookie" header in the response with the cookies provided by FlareSolverr
 			InjectSetCookieHeader(response, flareSolverrResponse);
 		}
+		*/
+		if (!ChallengeDetector.IsClearanceRequiredAsync(response)) {
+
+			return response;
+		}
+
+		var flareSolverrResponse = await _responseStorage.LoadAsync();
+
+		if (flareSolverrResponse != null) {
+			// Set user agent
+			if (flareSolverrResponse.Solution.UserAgent != null
+			    && flareSolverrResponse.Solution.UserAgent !=(request.Headers.UserAgent.ToString())) {
+				// Set the User-Agent if required
+				m_userAgent = flareSolverrResponse.Solution.UserAgent;
+				SetUserAgentHeader(request);
+			}
+
+			// Retry request with saved response
+			InjectCookies(request, flareSolverrResponse);
+			response = await base.SendAsync(request, cancellationToken).ConfigureAwait(false);
+
+			if (!ChallengeDetector.IsClearanceRequiredAsync(response)) {
+				// Success with saved response
+				InjectSetCookieHeader(response, flareSolverrResponse);
+				return response;
+			}
+		}
+
+		// Resolve the challenge using FlareSolverr API
+		flareSolverrResponse = await Solverr.SolveAsync(request);
+
+		// Save the FlareSolverr User-Agent for the following requests
+		var flareSolverUserAgent = flareSolverrResponse.Solution.UserAgent;
+
+		if (flareSolverUserAgent != null && !flareSolverUserAgent.Equals(request.Headers.UserAgent.ToString()))
+		{
+			m_userAgent = flareSolverUserAgent;
+
+			// Set the User-Agent if required
+			SetUserAgentHeader(request);
+		}
+
+		// Change the cookies in the original request with the cookies provided by FlareSolverr
+		InjectCookies(request, flareSolverrResponse);
+		response = await base.SendAsync(request, cancellationToken).ConfigureAwait(false);
+
+		// Detect if there is a challenge in the response
+		if (EnsureResponseIntegrity && ChallengeDetector.IsClearanceRequiredAsync(response)) {
+			throw new FlareSolverrException("The cookies provided by FlareSolverr are not valid");
+		}
+
+		// Add the "Set-Cookie" header in the response with the cookies provided by FlareSolverr
+		InjectSetCookieHeader(response, flareSolverrResponse);
+		await _responseStorage.SaveAsync(flareSolverrResponse);
 
 		return response;
 	}

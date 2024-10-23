@@ -31,12 +31,13 @@ public static class ChallengeDetector
 			                                 i.Product != null
 			                                 && CloudflareValues.CloudflareServerNames.Contains(
 				                                 i.Product.Name.ToLower()))) {
+			// return false;
 			return true;
 		}
 
 		// detect CloudFlare and DDoS-GUARD
 		if (response.StatusCode is HttpStatusCode.ServiceUnavailable or HttpStatusCode.Forbidden
-		    or (HttpStatusCode) 523) {
+		    or (HttpStatusCode) CloudflareValues.CloudflareStatusCodes.OriginUnreachable) {
 			var responseHtml = response.Content.ReadAsStringAsync().Result;
 
 

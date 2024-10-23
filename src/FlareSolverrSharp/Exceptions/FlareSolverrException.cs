@@ -7,7 +7,7 @@ namespace FlareSolverrSharp.Exceptions;
 /// </summary>
 public class FlareSolverrException : HttpRequestException
 {
-	public FlareSolverrException(string message) : base(message)
-	{
-	}
+
+	public FlareSolverrException(string message) : base(message) { }
+
 }

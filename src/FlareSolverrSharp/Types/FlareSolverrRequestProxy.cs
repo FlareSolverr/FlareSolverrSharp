@@ -6,13 +6,13 @@ public class FlareSolverrRequestProxy
 {
 
 	[JsonPropertyName("url")]
-	public string Url;
+	public string Url {get;set;}
 
 	[JsonPropertyName("username")]
-	public string Username;
+	public string Username{get;set;}
 
 	[JsonPropertyName("password")]
-	public string Password;
+	public string Password{get;set;}
 
 	public FlareSolverrRequestProxy() { }
 
