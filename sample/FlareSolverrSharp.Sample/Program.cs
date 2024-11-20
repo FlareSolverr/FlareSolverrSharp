@@ -25,18 +25,18 @@ public static class Program
 
 		var client = new HttpClient(handler);
 
-		var x = await client.GetAsync(Settings.ProtectedUri);
+		HttpRequestMessage[] rg =
+		[
+			new(HttpMethod.Get, "https://ascii2d.net/search/url/https://pomf2.lain.la/f/fy32pj5e.png"),
+			new(HttpMethod.Get, "https://ascii2d.net/search/url/https://i.redd.it/xixxli0axz7b1.jpg"),
+		];
 
-		Console.WriteLine(x);
-		Console.WriteLine( ChallengeDetector.IsClearanceRequiredAsync(x));
-		/*foreach (KeyValuePair<string, IEnumerable<string>> pair in x.Headers) {
-			Console.WriteLine(pair);
-		}*/
-		foreach (var y in x.Headers.Server) {
-			
-			Console.WriteLine(y.Product.Name);
-		}
-		// Assert.IsTrue(c.Message.Contains("Error connecting to FlareSolverr server"));
+		await Parallel.ForEachAsync(rg, async (x, y) =>
+		{
+			var res = await client.SendAsync(x, y);
+			Console.WriteLine($"{x.RequestUri} -> {res.StatusCode}");
+			return;
+		});
 	}
 
 }

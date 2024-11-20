@@ -188,9 +188,13 @@ public class FlareSolverr : INotifyPropertyChanged
 		T result = default;
 
 		//https://github.com/FlareSolverr/FlareSolverrSharp/pull/27/files
+		await Func();
 
 		//todo: what is this "semaphore locker" for
-		await s_locker.LockAsync(async () =>
+		// await s_locker.LockAsync(Func);
+		return result;
+
+		async Task Func()
 		{
 			HttpResponseMessage response;
 
@@ -219,8 +223,7 @@ public class FlareSolverr : INotifyPropertyChanged
 			}
 
 			// Don't try parsing if FlareSolverr hasn't returned 200 or 500
-			if (!AllowAnyStatusCode
-			    && (response.StatusCode is not (HttpStatusCode.OK or HttpStatusCode.InternalServerError))) {
+			if (!AllowAnyStatusCode && (response.StatusCode is not (HttpStatusCode.OK or HttpStatusCode.InternalServerError))) {
 				throw new FlareSolverrException($"Status code: {response.StatusCode}");
 			}
 
@@ -231,7 +234,7 @@ public class FlareSolverr : INotifyPropertyChanged
 
 				// result  = await JsonSerializer.DeserializeAsync<FlareSolverrResponse>(resContent, options);
 
-				result = JsonSerializer.Deserialize<T>(resContent, typeInfo);
+				result = JsonSerializer.Deserialize(resContent, typeInfo);
 			}
 			catch (Exception) {
 				throw new FlareSolverrException($"Error parsing response, check FlareSolverr. Response: {resContent}");
@@ -273,10 +276,7 @@ public class FlareSolverr : INotifyPropertyChanged
 			// return SendRequestAsync(flareSolverrRequest);*/
 
 
-		});
-		return result;
-
-
+		}
 	}
 
 
