@@ -25,15 +25,3 @@ public class FlareSolverrRequest
 	public FlareSolverrCookie[] Cookies { get; set; }
 
 }
-
-public class FlareSolverrIndexResponse
-{
-
-	[JsonPropertyName("msg")]
-	public string Message { get; set; }
-
-	public string Version { get; set; }
-
-	public string UserAgent { get; set; }
-
-}
