@@ -1,8 +1,6 @@
-﻿using Flurl.Http;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Net;
 using System.Text.Json.Serialization;
 
 // ReSharper disable UnusedMember.Global
@@ -36,93 +34,6 @@ public class FlareSolverrResponse
 
 	[JsonPropertyName("sessions")]
 	public string[] Sessions { get; set; }
-
-}
-
-public class FlareSolverrSolution
-{
-
-	[JsonPropertyName("url")]
-	public string Url { get; set; }
-
-	[JsonPropertyName("status")]
-	public int Status { get; set; }
-
-	[JsonPropertyName("headers")]
-	public FlareSolverrHeaders Headers { get; set; }
-
-	[JsonPropertyName("response")]
-	public string Response { get; set; }
-
-	[JsonPropertyName("cookies")]
-
-	// [JsonObjectCreationHandling(JsonObjectCreationHandling.Populate)]
-	public FlareSolverrCookie[] Cookies { get; set; }
-
-	[JsonPropertyName("userAgent")]
-	public string UserAgent { get; set; }
-
-	/*[JsonConstructor]
-	public FlareSolverrSolution()
-	{
-		Cookies = [];
-	}*/
-
-}
-
-public class FlareSolverrCookie
-{
-
-	[JsonPropertyName("name")]
-	public string Name { get; set; }
-
-	[JsonPropertyName("value")]
-	public string Value { get; set; }
-
-	[JsonPropertyName("domain")]
-	public string Domain { get; set; }
-
-	[JsonPropertyName("path")]
-	public string Path { get; set; }
-
-	[JsonPropertyName("expires")]
-	public int Expiry { get; set; }
-
-	[JsonPropertyName("httpOnly")]
-	public bool HttpOnly { get; set; }
-
-	[JsonPropertyName("secure")]
-	public bool Secure { get; set; }
-
-	[JsonPropertyName("sameSite")]
-	public string SameSite { get; set; }
-
-	public string ToHeaderValue()
-		=> $"{Name}={Value}";
-
-	public Cookie ToCookie()
-		=> new(Name, Value /*, Path, Domain*/);
-
-	/*[JsonConstructor]
-	public FlareSolverrCookie(string name, string value)
-	{
-		Name  = name;
-		Value = value;
-	}*/
-
-}
-
-public class FlareSolverrHeaders
-{
-
-	[JsonPropertyName("status")]
-	public string Status { get; set; }
-
-	[JsonPropertyName("date")]
-	public string Date { get; set; }
-
-	[JsonPropertyName("content-type")]
-	public string ContentType { get; set; }
 
 }
 

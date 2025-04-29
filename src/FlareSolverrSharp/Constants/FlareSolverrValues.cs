@@ -22,6 +22,6 @@ public static class FlareSolverrValues
 
 	public const string CMD_REQUEST_POST = "request.post";
 
-	internal const int MAX_TIMEOUT_DEFAULT = 60000;
+	public const int MAX_TIMEOUT_DEFAULT = 60 * 1000;
 
 }

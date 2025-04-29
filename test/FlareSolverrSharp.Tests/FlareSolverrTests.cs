@@ -60,6 +60,7 @@ public class FlareSolverrTests
 		Assert.IsTrue(!string.IsNullOrWhiteSpace(firstCookie.Name));
 		Assert.IsTrue(!string.IsNullOrWhiteSpace(firstCookie.Value));
 	}
+
 	[TestMethod]
 	public async Task SolveOk3()
 	{
@@ -80,6 +81,7 @@ public class FlareSolverrTests
 		Assert.IsTrue(!string.IsNullOrWhiteSpace(firstCookie.Name));
 		Assert.IsTrue(!string.IsNullOrWhiteSpace(firstCookie.Value));
 	}
+
 	[TestMethod]
 	public async Task SolveOkUserAgent()
 	{
@@ -108,6 +110,7 @@ public class FlareSolverrTests
 
 		var flareSolverrResponse = await flareSolverr.SolveAsync(request);
 		Assert.AreEqual("ok", flareSolverrResponse.Status);
+
 		// Assert.AreEqual("", flareSolverrResponse.Message);
 		Assert.IsTrue(flareSolverrResponse.StartTimestamp > 0);
 		Assert.IsTrue(flareSolverrResponse.EndTimestamp   > flareSolverrResponse.StartTimestamp);
@@ -130,10 +133,7 @@ public class FlareSolverrTests
 		var flareSolverr = new FlareSolverr(Settings.FlareSolverrApiUrl);
 		var request      = new HttpRequestMessage(HttpMethod.Get, uri);
 
-		await Assert.ThrowsExceptionAsync<FlareSolverrException>(() =>
-		{
-			return flareSolverr.SolveAsync(request);
-		});
+		await Assert.ThrowsExceptionAsync<FlareSolverrException>(() => { return flareSolverr.SolveAsync(request); });
 
 		/*try {
 			await flareSolverr.SolveAsync(request);
@@ -156,10 +156,7 @@ public class FlareSolverrTests
 		var flareSolverr = new FlareSolverr("http://localhost:44445");
 		var request      = new HttpRequestMessage(HttpMethod.Get, uri);
 
-		await Assert.ThrowsExceptionAsync<FlareSolverrException>(() =>
-		{
-			return flareSolverr.SolveAsync(request);
-		});
+		await Assert.ThrowsExceptionAsync<FlareSolverrException>(() => { return flareSolverr.SolveAsync(request); });
 
 		/*try {
 			Assert.Fail("Exception not thrown");
@@ -184,10 +181,7 @@ public class FlareSolverrTests
 		};
 		var request = new HttpRequestMessage(HttpMethod.Get, uri);
 
-		await Assert.ThrowsExceptionAsync<FlareSolverrException>(() =>
-		{
-			return flareSolverr.SolveAsync(request);
-		});
+		await Assert.ThrowsExceptionAsync<FlareSolverrException>(() => { return flareSolverr.SolveAsync(request); });
 
 
 		/*try {
@@ -213,10 +207,7 @@ public class FlareSolverrTests
 		};
 		var request = new HttpRequestMessage(HttpMethod.Get, uri);
 
-		await Assert.ThrowsExceptionAsync<FlareSolverrException>(() =>
-		{
-			return flareSolverr.SolveAsync(request);
-		});
+		await Assert.ThrowsExceptionAsync<FlareSolverrException>(() => { return flareSolverr.SolveAsync(request); });
 
 		/*try {
 			Assert.Fail("Exception not thrown");
@@ -260,6 +251,14 @@ public class FlareSolverrTests
 		// destroy session
 		flareSolverrResponse = await flareSolverr.DestroySessionAsync(sessionId);
 		Assert.AreEqual("ok", flareSolverrResponse.Status);
+	}
+
+	[TestMethod]
+	public async Task TestGetIndex()
+	{
+		var idx = await FlareSolverr.TryGetIndexAsync(new Uri("http://localhost:8191"));
+		
+
 	}
 
 }

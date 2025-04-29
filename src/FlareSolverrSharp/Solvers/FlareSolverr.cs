@@ -77,8 +77,9 @@ public class FlareSolverr : INotifyPropertyChanged
 			apiUrl += "/";
 		}
 
-		FlareSolverrApi = new Uri($"{apiUrl}v1");
+		FlareSolverrApi      = new Uri($"{apiUrl}v1");
 		FlareSolverrIndexUri = new Uri(apiUrl);
+
 		m_httpClient = new HttpClient()
 		{
 			// Timeout = AdjustHttpClientTimeout()
@@ -142,16 +143,31 @@ public class FlareSolverr : INotifyPropertyChanged
 
 	// https://github.com/FlareSolverr/FlareSolverrSharp/pull/26
 
+	public static async Task<FlareSolverrIndexResponse> TryGetIndexAsync(Uri uri)
+	{
+
+		try {
+			using var httpClient = new HttpClient();
+			var       client     = await httpClient.GetStreamAsync(uri);
+			var       content    = JsonSerializer.Deserialize(client, FlareSolverrContext.Default.FlareSolverrIndexResponse);
+			return content;
+		}
+		catch (Exception e) {
+			// return await Task.FromException<FlareSolverrIndexResponse>(e);
+			return null;
+		}
+	}
+
 	public Task<FlareSolverrIndexResponse> GetIndexAsync()
 	{
-		return SendFlareSolverrRequestInternalAsync<FlareSolverrIndexResponse>(
+		return SendFlareSolverrRequestInternalAsync(
 			null, FlareSolverrContext.Default.FlareSolverrIndexResponse);
 	}
 
 	private async Task<FlareSolverrResponse> SendFlareSolverrRequestAsync(HttpContent flareSolverrRequest)
 	{
 		FlareSolverrResponse result =
-			await SendFlareSolverrRequestInternalAsync<FlareSolverrResponse>(
+			await SendFlareSolverrRequestInternalAsync(
 				flareSolverrRequest, FlareSolverrContext.Default.FlareSolverrResponse);
 
 		try {
@@ -411,7 +427,8 @@ public class FlareSolverr : INotifyPropertyChanged
 
 	protected bool SetField<T>(ref T field, T value, [CallerMemberName] string propertyName = null)
 	{
-		if (EqualityComparer<T>.Default.Equals(field, value)) return false;
+		if (EqualityComparer<T>.Default.Equals(field, value))
+			return false;
 
 		field = value;
 		OnPropertyChanged(propertyName);
