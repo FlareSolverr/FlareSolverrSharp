@@ -4,9 +4,9 @@
 [![NuGet downloads](https://img.shields.io/nuget/dt/FlareSolverrSharp)](https://www.nuget.org/packages/FlareSolverrSharp)
 [![GitHub issues](https://img.shields.io/github/issues/FlareSolverr/FlareSolverrSharp.svg)](https://github.com/FlareSolverr/FlareSolverrSharp/issues)
 [![GitHub pull requests](https://img.shields.io/github/issues-pr/FlareSolverr/FlareSolverrSharp.svg)](https://github.com/FlareSolverr/FlareSolverrSharp/pulls)
-[![Donate PayPal](https://img.shields.io/badge/Donate-PayPal-yellow.svg)](https://www.paypal.com/paypalme/diegoheras0xff)
-[![Donate Bitcoin](https://img.shields.io/badge/Donate-Bitcoin-f7931a.svg)](https://www.blockchain.com/btc/address/13Hcv77AdnFWEUZ9qUpoPBttQsUT7q9TTh)
-[![Donate Ethereum](https://img.shields.io/badge/Donate-Ethereum-8c8c8c.svg)](https://www.blockchain.com/eth/address/0x0D1549BbB00926BF3D92c1A8A58695e982f1BE2E)
+[![GitHub Repo stars](https://img.shields.io/github/stars/FlareSolverr/FlareSolverrSharp)](https://github.com/FlareSolverr/FlareSolverrSharp)
+
+[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/ngosang)
 
 FlareSolverr .Net DelegatingHandler / interceptor. [FlareSolverr](https://github.com/FlareSolverr/FlareSolverr) is a proxy server to bypass Cloudflare protection.
 
