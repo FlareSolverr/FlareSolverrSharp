@@ -1,10 +1,11 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard1.3</TargetFramework>
+    <TargetFramework>net9.0</TargetFramework>
     <PackageId>FlareSolverrSharp</PackageId>
     <RootNamespace>FlareSolverrSharp</RootNamespace>
-    <Version>3.0.7</Version>
+    <LangVersion>latest</LangVersion>
+    <Version>3.0.9</Version>
     <Authors>Diego Heras (ngosang)</Authors>
     <Description>FlareSolverr .Net / Proxy server to bypass Cloudflare protection.</Description>
     <PackageTags>flaresolverr, flaresolver, cloudflare, solver, bypass, protection, solving, library, cloudflaresolver, delegatinghandler, recaptcha, captcha, javascript, challenge, utilities</PackageTags>
@@ -13,10 +14,25 @@
     <PackageLicenseUrl>https://github.com/ngosang/FlareSolverrSharp/blob/master/LICENSE</PackageLicenseUrl>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <AssemblyName>FlareSolverrSharp</AssemblyName>
+    <DefineConstants>JETBRAINS_ANNOTATIONS;TRACE</DefineConstants>
+    <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
+    <PublishSingleFile Condition="'$(Configuration)' == 'Release|AnyCPU'">true</PublishSingleFile>
+    <PublishTrimmed>True</PublishTrimmed>
+    <!-- <PublishSingleFile>true</PublishSingleFile> -->
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <NoWarn>1701;1702;IDE0049</NoWarn>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <NoWarn>1701;1702;IDE0049</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
+    <PackageReference Include="Flurl.Http" Version="4.0.2" />
+    <PackageReference Include="JetBrains.Annotations" Version="2024.3.0" />
+    <PackageReference Include="System.Text.Json" Version="8.0.5" />
   </ItemGroup>
 
 </Project>

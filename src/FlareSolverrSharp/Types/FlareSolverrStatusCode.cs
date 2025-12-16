@@ -1,11 +1,10 @@
 ﻿
 // ReSharper disable InconsistentNaming
-namespace FlareSolverrSharp.Types
+namespace FlareSolverrSharp.Types;
+
+public enum FlareSolverrStatusCode
 {
-    public enum FlareSolverrStatusCode
-    {
-        ok,
-        warning,
-        error
-    }
+	ok,
+	warning,
+	error
 }
