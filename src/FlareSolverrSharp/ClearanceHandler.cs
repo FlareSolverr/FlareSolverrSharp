@@ -14,7 +14,7 @@ using Cookie = System.Net.Cookie;
 namespace FlareSolverrSharp
 {
     /// <summary>
-    /// A HTTP handler that transparently manages CloudFlare's protection bypass.
+    /// An HTTP handler that transparently manages CloudFlare's protection bypass.
     /// </summary>
     public class ClearanceHandler : DelegatingHandler
     {
@@ -57,7 +57,9 @@ namespace FlareSolverrSharp
             // Validate URI
             if (!string.IsNullOrWhiteSpace(flareSolverrApiUrl)
                 && !Uri.IsWellFormedUriString(flareSolverrApiUrl, UriKind.Absolute))
+            {
                 throw new FlareSolverrException("FlareSolverr URL is malformed: " + flareSolverrApiUrl);
+            }
 
             _flareSolverrApiUrl = flareSolverrApiUrl;
 
@@ -99,10 +101,27 @@ namespace FlareSolverrSharp
             if (ChallengeDetector.IsClearanceRequired(response))
             {
                 if (_flareSolverr == null)
+                {
                     throw new FlareSolverrException("Challenge detected but FlareSolverr is not configured");
+                }
 
                 // Resolve the challenge using FlareSolverr API
                 var flareSolverrResponse = await _flareSolverr.Solve(request);
+
+                if (flareSolverrResponse == null)
+                {
+                    throw new FlareSolverrException("Empty response returned by FlareSolverr");
+                }
+
+                if (flareSolverrResponse.Solution == null)
+                {
+                    throw new FlareSolverrException("Empty solution returned by FlareSolverr");
+                }
+
+                if (flareSolverrResponse.Solution.Cookies == null || flareSolverrResponse.Solution.Cookies.Length == 0)
+                {
+                    throw new FlareSolverrException("Empty cookies returned by FlareSolverr");
+                }
 
                 // Save the FlareSolverr User-Agent for the following requests
                 var flareSolverUserAgent = flareSolverrResponse.Solution.UserAgent;
@@ -120,7 +139,9 @@ namespace FlareSolverrSharp
 
                 // Detect if there is a challenge in the response
                 if (ChallengeDetector.IsClearanceRequired(response))
+                {
                     throw new FlareSolverrException("The cookies provided by FlareSolverr are not valid");
+                }
 
                 // Add the "Set-Cookie" header in the response with the cookies provided by FlareSolverr
                 InjectSetCookieHeader(response, flareSolverrResponse);
@@ -142,15 +163,18 @@ namespace FlareSolverrSharp
         private void InjectCookies(HttpRequestMessage request, FlareSolverrResponse flareSolverrResponse)
         {
             // use only Cloudflare and DDoS-GUARD cookies
-            var flareCookies = flareSolverrResponse.Solution.Cookies
-                                                   .Where(cookie => IsCloudflareCookie(cookie.Name))
-                                                   .ToList();
+            var flareCookies = flareSolverrResponse.Solution
+                .Cookies
+                .Where(cookie => IsCloudflareCookie(cookie.Name))
+                .ToList();
 
             // not using cookies, just add flaresolverr cookies to the header request
             if (!HttpClientHandler.UseCookies)
             {
                 foreach (var rCookie in flareCookies)
+                {
                     request.Headers.Add(HttpHeaders.Cookie, rCookie.ToHeaderValue());
+                }
 
                 return;
             }
@@ -158,21 +182,29 @@ namespace FlareSolverrSharp
             var currentCookies = HttpClientHandler.CookieContainer.GetCookies(request.RequestUri);
 
             // remove previous FlareSolverr cookies
-            foreach (var cookie in flareCookies.Select(flareCookie => currentCookies[flareCookie.Name]).Where(cookie => cookie != null))           
+            foreach (var cookie in flareCookies.Select(flareCookie => currentCookies[flareCookie.Name]).Where(cookie => cookie != null))
+            {
                 cookie.Expired = true;
+            }
 
             // add FlareSolverr cookies to CookieContainer
             foreach (var rCookie in flareCookies)
+            {
                 HttpClientHandler.CookieContainer.Add(request.RequestUri, rCookie.ToCookieObj());
+            }
 
             // check if there is too many cookies, we may need to remove some
-            if (HttpClientHandler.CookieContainer.PerDomainCapacity >= currentCookies.Count)           
+            if (HttpClientHandler.CookieContainer.PerDomainCapacity >= currentCookies.Count)
+            {
                 return;
+            }
 
             // check if indeed we have too many cookies
             var validCookiesCount = currentCookies.Cast<Cookie>().Count(cookie => !cookie.Expired);
-            if (HttpClientHandler.CookieContainer.PerDomainCapacity >= validCookiesCount)          
-                return;           
+            if (HttpClientHandler.CookieContainer.PerDomainCapacity >= validCookiesCount)
+            {
+                return;
+            }
 
             // if there is a too many cookies, we have to make space
             // maybe is better to raise an exception?
@@ -180,11 +212,15 @@ namespace FlareSolverrSharp
 
             foreach (Cookie cookie in currentCookies)
             {
-                if (cookieExcess == 0)              
-                    break;               
+                if (cookieExcess == 0)
+                {
+                    break;
+                }
 
-                if (cookie.Expired || IsCloudflareCookie(cookie.Name))              
-                    continue;               
+                if (cookie.Expired || IsCloudflareCookie(cookie.Name))
+                {
+                    continue;
+                }
 
                 cookie.Expired = true;
                 cookieExcess -= 1;
@@ -195,7 +231,9 @@ namespace FlareSolverrSharp
         {
             // inject set-cookie headers in the response
             foreach (var rCookie in flareSolverrResponse.Solution.Cookies.Where(cookie => IsCloudflareCookie(cookie.Name)))
+            {
                 response.Headers.Add(HttpHeaders.SetCookie, rCookie.ToHeaderValue());
+            }
         }
 
         private static bool IsCloudflareCookie(string cookieName) =>
@@ -204,7 +242,9 @@ namespace FlareSolverrSharp
         protected override void Dispose(bool disposing)
         {
             if (disposing)
+            {
                 _client.Dispose();
+            }
 
             base.Dispose(disposing);
         }
