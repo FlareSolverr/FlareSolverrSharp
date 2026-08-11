@@ -16,7 +16,7 @@ Full-Featured library:
 `PM> Install-Package FlareSolverr`
 
 ## Dependencies
-- [.NET Standard 1.3](https://learn.microsoft.com/en-us/dotnet/standard/net-standard?tabs=net-standard-1-3) / [.NET Standard 2.0](https://learn.microsoft.com/en-us/dotnet/standard/net-standard?tabs=net-standard-2-0)
+- [.NET Standard 2.0](https://learn.microsoft.com/en-us/dotnet/standard/net-standard?tabs=net-standard-2-0)
 
 You need a running [FlareSolverr](https://github.com/FlareSolverr/FlareSolverr) service.
 
