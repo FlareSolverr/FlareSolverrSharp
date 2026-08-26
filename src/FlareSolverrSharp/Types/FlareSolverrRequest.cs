@@ -15,5 +15,8 @@ namespace FlareSolverrSharp.Types
 
         [JsonProperty("proxy")]
         public FlareSolverrRequestProxy Proxy;
+
+        [JsonProperty("cookies")]
+        public Cookie[] Cookies;
     }
 }
