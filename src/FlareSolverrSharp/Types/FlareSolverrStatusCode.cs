@@ -1,5 +1,4 @@
-﻿
-// ReSharper disable InconsistentNaming
+﻿// ReSharper disable InconsistentNaming
 namespace FlareSolverrSharp.Types
 {
     public enum FlareSolverrStatusCode

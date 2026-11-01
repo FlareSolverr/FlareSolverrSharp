@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Net;
 using System.Net.Http;
+using System.Net.Http.Json;
 using System.Text;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using FlareSolverrSharp.Exceptions;
 using FlareSolverrSharp.Types;
 using FlareSolverrSharp.Utilities;
-using Newtonsoft.Json;
 
 namespace FlareSolverrSharp.Solvers
 {
@@ -101,14 +103,13 @@ namespace FlareSolverrSharp.Solvers
                     throw new FlareSolverrException("HTTP StatusCode not 200 or 500. Status is :" + response.StatusCode);
                 }
 
-                var resContent = await response.Content.ReadAsStringAsync();
                 try
                 {
-                    result = JsonConvert.DeserializeObject<FlareSolverrResponse>(resContent);
+                    result = await response.Content.ReadFromJsonAsync<FlareSolverrResponse>();
                 }
                 catch (Exception)
                 {
-                    throw new FlareSolverrException("Error parsing response, check FlareSolverr. Response: " + resContent);
+                    throw new FlareSolverrException("Error parsing response, check FlareSolverr. Response: " + await response.Content.ReadAsStringAsync());
                 }
 
                 try
@@ -170,12 +171,12 @@ namespace FlareSolverrSharp.Solvers
 
         private HttpContent GetSolverRequestContent(FlareSolverrRequest request)
         {
-            var payload = JsonConvert.SerializeObject(request, new JsonSerializerSettings
+            var payload = JsonSerializer.Serialize(request, new JsonSerializerOptions
             {
-                NullValueHandling = NullValueHandling.Ignore
+                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
             });
-            HttpContent content = new StringContent(payload, Encoding.UTF8, "application/json");
-            return content;
+
+            return new StringContent(payload, Encoding.UTF8, "application/json");
         }
 
         private HttpContent GenerateFlareSolverrRequest(HttpRequestMessage request, string sessionId = "")
