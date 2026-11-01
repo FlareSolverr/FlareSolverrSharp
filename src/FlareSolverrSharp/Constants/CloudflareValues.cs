@@ -54,19 +54,4 @@ public static class CloudflareValues
 	       Error 530 is returned along with a 1xxx error.[54]
 	 */
 
-
-	public enum CloudflareStatusCodes : int
-	{
-
-		WebServerUnknown      = 520,
-		WebServerDown         = 521,
-		ConnectionTimedOut    = 522,
-		OriginUnreachable     = 523,
-		TimeoutOccurred       = 524,
-		SslHandshakeFailed    = 525,
-		InvalidSslCertificate = 526,
-		RailgunError          = 527,
-
-	}
-
 }

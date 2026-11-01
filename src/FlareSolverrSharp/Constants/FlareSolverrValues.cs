@@ -6,11 +6,17 @@ namespace FlareSolverrSharp.Constants;
 public static class FlareSolverrValues
 {
 
+#region Headers
+
 	public const string UserAgent = "User-Agent";
 
 	public const string Cookie = "Cookie";
 
 	public const string SetCookie = "Set-Cookie";
+
+#endregion
+
+#region Commands
 
 	public const string CMD_SESSIONS_CREATE = "sessions.create";
 
@@ -22,6 +28,8 @@ public static class FlareSolverrValues
 
 	public const string CMD_REQUEST_POST = "request.post";
 
-	public const int MAX_TIMEOUT_DEFAULT = 60 * 1000;
+#endregion
+
+	public const int MAX_TIMEOUT_DEFAULT = 60_000;
 
 }

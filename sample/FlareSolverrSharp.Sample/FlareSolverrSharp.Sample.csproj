@@ -6,6 +6,7 @@
     <RootNamespace>FlareSolverrSharp.Sample</RootNamespace>
     <AssemblyName>FlareSolverrSharp.Sample</AssemblyName>
     <Version>3.0.8</Version>
+    <LangVersion>latest</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>

@@ -37,7 +37,7 @@ public static class ChallengeDetector
 
 		// detect CloudFlare and DDoS-GUARD
 		if (response.StatusCode is HttpStatusCode.ServiceUnavailable or HttpStatusCode.Forbidden
-		    or (HttpStatusCode) CloudflareValues.CloudflareStatusCodes.OriginUnreachable) {
+		    or (HttpStatusCode) CloudflareStatusCodes.OriginUnreachable) {
 			var responseHtml = response.Content.ReadAsStringAsync().Result;
 
 
@@ -56,5 +56,8 @@ public static class ChallengeDetector
 
 		return false;
 	}
+
+	public static bool IsCloudflareCookie(string cookieName) =>
+		cookieName.StartsWith("cf_") || cookieName.StartsWith("__cf") || cookieName.StartsWith("__ddg");
 
 }

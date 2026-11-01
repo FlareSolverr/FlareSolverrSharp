@@ -24,13 +24,7 @@ public class ClearanceHandlerTests
 		var uri = new Uri("https://www.google.com/");
 
 		var handler = new ClearanceHandler(Settings.FlareSolverrApiUrl)
-		{
-			Solverr =
-			{
-				// MaxTimeout = 60000
-
-			}
-		};
+			{ };
 
 		var client   = new HttpClient(handler);
 		var response = await client.GetAsync(uri);
@@ -42,12 +36,8 @@ public class ClearanceHandlerTests
 	{
 		var handler = new ClearanceHandler(Settings.FlareSolverrApiUrl)
 		{
-			EnsureResponseIntegrity = false,
-			Solverr =
-			{
-				// MaxTimeout = 60000
+			// EnsureResponseIntegrity = false,
 
-			}
 		};
 
 		var client   = new HttpClient(handler);
@@ -85,13 +75,8 @@ public class ClearanceHandlerTests
 		};
 
 		var handler = new ClearanceHandler(Settings.FlareSolverrApiUrl)
-		{
-			Solverr =
-			{
-				// MaxTimeout = 60000
+			{ };
 
-			}
-		};
 		handler.InnerHandler = clientHandler;
 
 		var client   = new HttpClient(handler);
@@ -110,11 +95,6 @@ public class ClearanceHandlerTests
 		var handler = new ClearanceHandler(Settings.FlareSolverrApiUrl)
 		{
 			EnsureResponseIntegrity = false,
-			Solverr =
-			{
-				MaxTimeout = 60000
-
-			}
 		};
 
 		var request = new HttpRequestMessage();
@@ -126,6 +106,7 @@ public class ClearanceHandlerTests
 
 		var client   = new HttpClient(handler);
 		var response = await client.SendAsync(request);
+
 		// Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
 		Assert.IsNotNull(response.StatusCode);
 	}
@@ -134,13 +115,7 @@ public class ClearanceHandlerTests
 	public async Task SolveOkCloudflareUserAgentHeader()
 	{
 		var handler = new ClearanceHandler(Settings.FlareSolverrApiUrl)
-		{
-			Solverr =
-			{
-				// MaxTimeout = 60000
-
-			}
-		};
+			{ };
 
 		var request = new HttpRequestMessage(HttpMethod.Get, Settings.ProtectedUri);
 		request.Headers.UserAgent.ParseAdd("Mozilla/5.0 (X11; Linux x86_64; rv:108.0) Gecko/20100101 Firefox/108.0");
@@ -158,11 +133,9 @@ public class ClearanceHandlerTests
 	{
 		var handler = new ClearanceHandler(Settings.FlareSolverrApiUrl)
 		{
-			Solverr =
-			{
-				MaxTimeout = 60000,
-				Proxy      = {Url   = Settings.ProxyUrl}
-			}
+
+			MaxTimeout = 60000,
+			ProxyUrl   = Settings.ProxyUrl,
 		};
 
 		var client   = new HttpClient(handler);
@@ -175,10 +148,8 @@ public class ClearanceHandlerTests
 	{
 		var handler = new ClearanceHandler(Settings.FlareSolverrApiUrl)
 		{
-			Solverr =
-			{
-				MaxTimeout = 60000
-			}
+			MaxTimeout = 60000
+
 		};
 
 		var client   = new HttpClient(handler);
@@ -235,19 +206,12 @@ public class ClearanceHandlerTests
 		var handler = new ClearanceHandler(Settings.FlareSolverrApiUrl)
 		{
 			EnsureResponseIntegrity = true,
-			Solverr =
-			{
-				MaxTimeout = 60000
-			}
+			MaxTimeout              = 60000
 		};
 
 		var client = new HttpClient(handler);
 
-		var c = await Assert.ThrowsAsync<HttpRequestException>(() =>
-
-		{
-			return client.GetAsync(uri);
-		}, "Exception not thrown");
+		var c = await Assert.ThrowsAsync<HttpRequestException>(() => { return client.GetAsync(uri); }, "Exception not thrown");
 
 		/*try {
 			Assert.Fail();
@@ -266,18 +230,13 @@ public class ClearanceHandlerTests
 		var handler = new ClearanceHandler("http://localhost:44445")
 		{
 			EnsureResponseIntegrity = true,
-			Solverr =
-			{
-				MaxTimeout = 60000
-			}
+			MaxTimeout              = 60000
+
 		};
 
 		var client = new HttpClient(handler);
 
-		var c = await Assert.ThrowsAsync<FlareSolverrException>(() =>
-		{
-			return client.GetAsync(Settings.ProtectedUri);
-		}, "Exception not thrown");
+		var c = await Assert.ThrowsAsync<FlareSolverrException>(() => { return client.GetAsync(Settings.ProtectedUri); }, "Exception not thrown");
 
 		Assert.IsTrue(c.Message.Contains("Error connecting to FlareSolverr server"));
 
@@ -287,15 +246,13 @@ public class ClearanceHandlerTests
 	public void SolveErrorBadConfigMalformed()
 	{
 
-		var e =  Assert.Throws<FlareSolverrException>(() =>
+		var e = Assert.Throws<FlareSolverrException>(() =>
 		{
 			new ClearanceHandler("http:/127.0.0.1:9999")
 			{
 				EnsureResponseIntegrity = true,
-				Solverr =
-				{
-					MaxTimeout = 60000
-				}
+				MaxTimeout              = 60000
+
 			};
 		});
 
@@ -311,10 +268,8 @@ public class ClearanceHandlerTests
 			var handler = new ClearanceHandler("")
 			{
 				EnsureResponseIntegrity = true,
-				Solverr =
-				{
-					MaxTimeout = 60000
-				}
+				MaxTimeout              = 60000
+
 			};
 			var client = new HttpClient(handler);
 			return client.GetAsync(Settings.ProtectedUri);
@@ -330,24 +285,15 @@ public class ClearanceHandlerTests
 		var handler = new ClearanceHandler(Settings.FlareSolverrApiUrl)
 		{
 			EnsureResponseIntegrity = true,
-			Solverr =
-			{
-				Proxy = 
-				{
-					Url   = "http://localhost:44445"
-				},
-				MaxTimeout = 60000,
+			ProxyUrl = "http://localhost:44445",
 
+			MaxTimeout = 60000
 
-			}
 		};
 
 		var client = new HttpClient(handler);
 
-		var e = await Assert.ThrowsAsync<FlareSolverrException>(() =>
-		{
-			return client.GetAsync(Settings.ProtectedUri);
-		});
+		var e = await Assert.ThrowsAsync<FlareSolverrException>(() => { return client.GetAsync(Settings.ProtectedUri); });
 
 		/*Assert.IsTrue(e.Message.Contains(
 			              "FlareSolverr was unable to process the request, please check FlareSolverr logs. Message: Error: Unable to process browser request. Error: NS_ERROR_PROXY_CONNECTION_REFUSED at "
@@ -360,18 +306,13 @@ public class ClearanceHandlerTests
 	{
 		var handler = new ClearanceHandler(Settings.FlareSolverrApiUrl)
 		{
-			Solverr =
-			{
-				MaxTimeout = 200
-			}
+			MaxTimeout              = 200
+
 		};
 
 		var client = new HttpClient(handler);
 
-		var e = await Assert.ThrowsAsync<FlareSolverrException>(() =>
-		{
-			return client.GetAsync(Settings.ProtectedUri);
-		});
+		var e = await Assert.ThrowsAsync<FlareSolverrException>(() => { return client.GetAsync(Settings.ProtectedUri); });
 
 		/*Assert.IsTrue(e.Message.Contains(
 			              "FlareSolverr was unable to process the request, please check FlareSolverr logs. Message: Error: Error solving the challenge. Timeout after 0.2 seconds."))*/

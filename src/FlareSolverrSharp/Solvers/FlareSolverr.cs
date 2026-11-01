@@ -40,7 +40,9 @@ public class FlareSolverr : INotifyPropertyChanged
 			JsonIgnoreCondition.WhenWritingDefault,
 	};
 
-	private static readonly SemaphoreLocker s_locker = new();
+	private static readonly SemaphoreLocker s_locker     = new();
+
+	private static readonly HttpClient      s_httpClient = new();
 
 	private readonly HttpClient m_httpClient;
 
@@ -48,14 +50,12 @@ public class FlareSolverr : INotifyPropertyChanged
 
 	public Uri FlareSolverrIndexUri { get; }
 
-	private int m_maxTimeout;
-
 	public int MaxTimeout
 	{
-		get => m_maxTimeout;
+		get;
 		set
 		{
-			SetField(ref m_maxTimeout, value);
+			SetField(ref field, value);
 			m_httpClient.Timeout = AdjustHttpClientTimeout();
 		}
 	}
@@ -94,8 +94,7 @@ public class FlareSolverr : INotifyPropertyChanged
 		};*/
 	}
 
-	public Task<FlareSolverrResponse> SolveAsync(HttpRequestMessage request, string sessionId = null,
-	                                             FlareSolverrCookie[] cookies = null)
+	public Task<FlareSolverrResponse> SolveAsync(HttpRequestMessage request, string sessionId = null, FlareSolverrCookie[] cookies = null)
 	{
 		var content = GenerateFlareSolverrRequest(request, sessionId, cookies);
 		return SendFlareSolverrRequestAsync(content);
@@ -147,14 +146,13 @@ public class FlareSolverr : INotifyPropertyChanged
 	{
 
 		try {
-			using var httpClient = new HttpClient();
-			var       client     = await httpClient.GetStreamAsync(uri);
+			var       client     = await s_httpClient.GetStreamAsync(uri);
 			var       content    = JsonSerializer.Deserialize(client, FlareSolverrContext.Default.FlareSolverrIndexResponse);
 			return content;
 		}
 		catch (Exception e) {
-			// return await Task.FromException<FlareSolverrIndexResponse>(e);
-			return null;
+			return await Task.FromException<FlareSolverrIndexResponse>(e);
+			// return null;
 		}
 	}
 
@@ -166,40 +164,34 @@ public class FlareSolverr : INotifyPropertyChanged
 
 	private async Task<FlareSolverrResponse> SendFlareSolverrRequestAsync(HttpContent flareSolverrRequest)
 	{
-		FlareSolverrResponse result =
-			await SendFlareSolverrRequestInternalAsync(
-				flareSolverrRequest, FlareSolverrContext.Default.FlareSolverrResponse);
+		FlareSolverrResponse result = await SendFlareSolverrRequestInternalAsync(flareSolverrRequest, FlareSolverrContext.Default.FlareSolverrResponse);
 
 		try {
-			Enum.TryParse(result.Status, true, out FlareSolverrStatusCode returnStatusCode);
 
-			if (returnStatusCode == FlareSolverrStatusCode.ok) {
+
+			if (Enum.TryParse(result.Status, true, out FlareSolverrStatusCode returnStatusCode) && returnStatusCode == FlareSolverrStatusCode.ok) {
 				return result;
-
 			}
-			else {
-				string errMsg = returnStatusCode switch
-				{
-					FlareSolverrStatusCode.warning =>
-						$"FlareSolverr was able to process the request, but a captcha was detected. Message: {result.Message}",
-					FlareSolverrStatusCode.error =>
-						$"FlareSolverr was unable to process the request, please check FlareSolverr logs. Message: {result.Message}",
-					_ =>
-						$"Unable to map FlareSolverr returned status code, received code: {result.Status}. Message: {result.Message}"
-				};
-				throw new FlareSolverrException(errMsg);
 
-			}
+			string errMsg = returnStatusCode switch
+			{
+				FlareSolverrStatusCode.warning =>
+					$"FlareSolverr was able to process the request, but a captcha was detected. Message: {result.Message}",
+				FlareSolverrStatusCode.error =>
+					$"FlareSolverr was unable to process the request, please check FlareSolverr logs. Message: {result.Message}",
+				_ =>
+					$"Unable to map FlareSolverr returned status code, received code: {result.Status}. Message: {result.Message}"
+			};
+			throw new FlareSolverrException(errMsg);
 
 		}
-		catch (ArgumentException) {
+		catch (Exception e) {
 			throw new FlareSolverrException(
 				$"Error parsing status code, check FlareSolverr log. Status: {result.Status}. Message: {result.Message}");
 		}
 	}
 
-	private async Task<T> SendFlareSolverrRequestInternalAsync<T>(HttpContent flareSolverrRequest,
-	                                                              JsonTypeInfo<T> typeInfo)
+	private async Task<T> SendFlareSolverrRequestInternalAsync<T>(HttpContent flareSolverrRequest, JsonTypeInfo<T> typeInfo)
 	{
 		T result = default;
 
@@ -207,7 +199,7 @@ public class FlareSolverr : INotifyPropertyChanged
 		await Func();
 
 		//todo: what is this "semaphore locker" for
-		// await s_locker.LockAsync(Func);
+		await s_locker.LockAsync(Func);
 		return result;
 
 		async Task Func()
@@ -319,7 +311,7 @@ public class FlareSolverr : INotifyPropertyChanged
 		return proxy;
 	}*/
 
-	private HttpContent GetSolverRequestContent(FlareSolverrRequest request)
+	private static HttpContent GetSolverRequestContent(FlareSolverrRequest request)
 	{
 		var payload = JsonSerializer.Serialize(request, FlareSolverrContext.Default.FlareSolverrRequest);
 
@@ -329,11 +321,9 @@ public class FlareSolverr : INotifyPropertyChanged
 		// return payload;
 	}
 
-	private HttpContent GenerateFlareSolverrRequest(HttpRequestMessage request, string sessionId = null,
-	                                                FlareSolverrCookie[] cookies = null)
+	private HttpContent GenerateFlareSolverrRequest(HttpRequestMessage request, string sessionId = null, FlareSolverrCookie[] cookies = null)
 	{
 		FlareSolverrRequest req;
-
 
 		var url = request.RequestUri.ToString();
 

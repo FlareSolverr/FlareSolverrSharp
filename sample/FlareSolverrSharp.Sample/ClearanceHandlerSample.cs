@@ -5,6 +5,7 @@ using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web;
+using Flurl.Http;
 
 namespace FlareSolverrSharp.Sample;
 
@@ -12,34 +13,28 @@ public static class ClearanceHandlerSample
 {
 
 	public static string FlareSolverrUrl = "http://localhost:8191/";
-	public static string ProtectedUrl    = "https://badasstorrents.com/torrents/search/720p/date/desc";
+	public static string ProtectedUrl    = "http://iqdb.org";
 
 	public static async Task SampleGet()
 	{
 		var handler = new ClearanceHandler(FlareSolverrUrl)
 		{
-			Solverr =
-			{
-				MaxTimeout = 60000
-
-			}
+			MaxTimeout = 60_000
 		};
 
-		var client  = new HttpClient(handler);
-		var content = await client.GetStringAsync(ProtectedUrl);
-		Console.WriteLine(content);
+		var flurlClient = new FlurlClient(new HttpClient(handler)) {Settings = { }};
+		var content2 = await flurlClient.Request(ProtectedUrl).GetAsync();
+		Console.WriteLine(content2.ResponseMessage.IsSuccessStatusCode);
+		Console.WriteLine(content2.Cookies.Count);
+		
 	}
 
 	public static async Task SamplePostUrlEncoded()
 	{
 		var handler = new ClearanceHandler(FlareSolverrUrl)
 		{
-			Solverr =
-			{
-				MaxTimeout = 60000
+			MaxTimeout = 60_000
 
-
-			}
 		};
 
 		var request = new HttpRequestMessage();

@@ -7,10 +7,15 @@ namespace FlareSolverrSharp.Extensions;
 
 public static class HttpMessageHandlerExtensions
 {
-	public static HttpMessageHandler GetInnermostHandler(this HttpMessageHandler self)
+	extension(HttpMessageHandler self)
 	{
-		return self is DelegatingHandler handler
-			       ? handler.InnerHandler.GetInnermostHandler()
-			       : self;
+
+		public HttpMessageHandler GetInnermostHandler()
+		{
+			return self is DelegatingHandler handler
+				       ? handler.InnerHandler.GetInnermostHandler()
+				       : self;
+		}
+
 	}
 }
