@@ -1,17 +1,15 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
     <PackageId>FlareSolverrSharp</PackageId>
     <RootNamespace>FlareSolverrSharp</RootNamespace>
-    <LangVersion>latest</LangVersion>
-    <Version>3.0.9</Version>
+    <Version>3.0.7</Version>
     <Authors>Diego Heras (ngosang)</Authors>
     <Description>FlareSolverr .Net / Proxy server to bypass Cloudflare protection.</Description>
     <PackageTags>flaresolverr, flaresolver, cloudflare, solver, bypass, protection, solving, library, cloudflaresolver, delegatinghandler, recaptcha, captcha, javascript, challenge, utilities</PackageTags>
-    <RepositoryUrl>https://github.com/ngosang/FlareSolverrSharp</RepositoryUrl>
-    <PackageProjectUrl>https://github.com/ngosang/FlareSolverrSharp</PackageProjectUrl>
-    <PackageLicenseUrl>https://github.com/ngosang/FlareSolverrSharp/blob/master/LICENSE</PackageLicenseUrl>
+    <RepositoryUrl>https://github.com/FlareSolverr/FlareSolverrSharp</RepositoryUrl>
+    <PackageProjectUrl>https://github.com/FlareSolverr/FlareSolverrSharp</PackageProjectUrl>
+    <PackageLicenseUrl>https://github.com/FlareSolverr/FlareSolverrSharp/blob/master/LICENSE</PackageLicenseUrl>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <AssemblyName>FlareSolverrSharp</AssemblyName>
     <DefineConstants>JETBRAINS_ANNOTATIONS;TRACE</DefineConstants>
