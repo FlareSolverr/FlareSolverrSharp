@@ -133,7 +133,7 @@ public class FlareSolverrTests
 		var flareSolverr = new FlareSolverr(Settings.FlareSolverrApiUrl);
 		var request      = new HttpRequestMessage(HttpMethod.Get, uri);
 
-		await Assert.ThrowsExceptionAsync<FlareSolverrException>(() => { return flareSolverr.SolveAsync(request); });
+		await Assert.ThrowsAsync<FlareSolverrException>(() => { return flareSolverr.SolveAsync(request); });
 
 		/*try {
 			await flareSolverr.SolveAsync(request);
@@ -156,7 +156,7 @@ public class FlareSolverrTests
 		var flareSolverr = new FlareSolverr("http://localhost:44445");
 		var request      = new HttpRequestMessage(HttpMethod.Get, uri);
 
-		await Assert.ThrowsExceptionAsync<FlareSolverrException>(() => { return flareSolverr.SolveAsync(request); });
+		await Assert.ThrowsAsync<FlareSolverrException>(() => { return flareSolverr.SolveAsync(request); });
 
 		/*try {
 			Assert.Fail("Exception not thrown");
@@ -181,7 +181,7 @@ public class FlareSolverrTests
 		};
 		var request = new HttpRequestMessage(HttpMethod.Get, uri);
 
-		await Assert.ThrowsExceptionAsync<FlareSolverrException>(() => { return flareSolverr.SolveAsync(request); });
+		await Assert.ThrowsAsync<FlareSolverrException>(() => { return flareSolverr.SolveAsync(request); });
 
 
 		/*try {
@@ -207,7 +207,7 @@ public class FlareSolverrTests
 		};
 		var request = new HttpRequestMessage(HttpMethod.Get, uri);
 
-		await Assert.ThrowsExceptionAsync<FlareSolverrException>(() => { return flareSolverr.SolveAsync(request); });
+		await Assert.ThrowsAsync<FlareSolverrException>(() => { return flareSolverr.SolveAsync(request); });
 
 		/*try {
 			Assert.Fail("Exception not thrown");

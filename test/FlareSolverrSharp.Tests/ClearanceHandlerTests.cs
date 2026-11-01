@@ -243,7 +243,7 @@ public class ClearanceHandlerTests
 
 		var client = new HttpClient(handler);
 
-		var c = await Assert.ThrowsExceptionAsync<HttpRequestException>(() =>
+		var c = await Assert.ThrowsAsync<HttpRequestException>(() =>
 
 		{
 			return client.GetAsync(uri);
@@ -274,7 +274,7 @@ public class ClearanceHandlerTests
 
 		var client = new HttpClient(handler);
 
-		var c = await Assert.ThrowsExceptionAsync<FlareSolverrException>(() =>
+		var c = await Assert.ThrowsAsync<FlareSolverrException>(() =>
 		{
 			return client.GetAsync(Settings.ProtectedUri);
 		}, "Exception not thrown");
@@ -287,7 +287,7 @@ public class ClearanceHandlerTests
 	public void SolveErrorBadConfigMalformed()
 	{
 
-		var e = Assert.ThrowsException<FlareSolverrException>(() =>
+		var e =  Assert.Throws<FlareSolverrException>(() =>
 		{
 			new ClearanceHandler("http:/127.0.0.1:9999")
 			{
@@ -306,7 +306,7 @@ public class ClearanceHandlerTests
 	[TestMethod]
 	public async Task SolveErrorNoConfig()
 	{
-		var e = await Assert.ThrowsExceptionAsync<FlareSolverrException>(() =>
+		var e = await Assert.ThrowsAsync<FlareSolverrException>(() =>
 		{
 			var handler = new ClearanceHandler("")
 			{
@@ -344,7 +344,7 @@ public class ClearanceHandlerTests
 
 		var client = new HttpClient(handler);
 
-		var e = await Assert.ThrowsExceptionAsync<FlareSolverrException>(() =>
+		var e = await Assert.ThrowsAsync<FlareSolverrException>(() =>
 		{
 			return client.GetAsync(Settings.ProtectedUri);
 		});
@@ -368,7 +368,7 @@ public class ClearanceHandlerTests
 
 		var client = new HttpClient(handler);
 
-		var e = await Assert.ThrowsExceptionAsync<FlareSolverrException>(() =>
+		var e = await Assert.ThrowsAsync<FlareSolverrException>(() =>
 		{
 			return client.GetAsync(Settings.ProtectedUri);
 		});
