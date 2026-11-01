@@ -1,14 +1,21 @@
 ﻿using System.Net.Http;
 
-namespace FlareSolverrSharp.Extensions
+// ReSharper disable TailRecursiveCall
+// ReSharper disable InconsistentNaming
+
+namespace FlareSolverrSharp.Extensions;
+
+public static class HttpMessageHandlerExtensions
 {
-    internal static class HttpMessageHandlerExtensions
-    {
-        public static HttpMessageHandler GetMostInnerHandler(this HttpMessageHandler self)
-        {
-            return self is DelegatingHandler handler
-                ? handler.InnerHandler.GetMostInnerHandler()
-                : self;
-        }
-    }
+	extension(HttpMessageHandler self)
+	{
+
+		public HttpMessageHandler GetInnermostHandler()
+		{
+			return self is DelegatingHandler handler
+				       ? handler.InnerHandler.GetInnermostHandler()
+				       : self;
+		}
+
+	}
 }

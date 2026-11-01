@@ -1,19 +1,27 @@
-﻿using Newtonsoft.Json;
+﻿using System.Text.Json.Serialization;
+using System.Threading.Tasks;
 
-namespace FlareSolverrSharp.Types
+
+namespace FlareSolverrSharp.Types;
+
+[JsonDerivedType(typeof(FlareSolverrRequestGet))]
+[JsonDerivedType(typeof(FlareSolverrRequestPost))]
+public class FlareSolverrRequest
 {
-    public class FlareSolverrRequest
-    {
-        [JsonProperty("cmd")]
-        public string Cmd;
 
-        [JsonProperty("url")]
-        public string Url;
+	[JsonPropertyName("cmd")]
+	public string Command { get; set; }
 
-        [JsonProperty("session")]
-        public string Session;
+	[JsonPropertyName("url")]
+	public string Url { get; set; }
 
-        [JsonProperty("proxy")]
-        public FlareSolverrRequestProxy Proxy;
-    }
+	[JsonPropertyName("session")]
+	public string Session { get; set; }
+
+	[JsonPropertyName("proxy")]
+	public FlareSolverrRequestProxy Proxy { get; set; }
+
+	[JsonPropertyName("cookies")]
+	public FlareSolverrCookie[] Cookies { get; set; }
+
 }
